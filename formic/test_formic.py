@@ -1112,7 +1112,7 @@ class TestMiscellaneous(object):
         assert drive == ""
         assert components == [ ]
 
-        drive, components = get_path_components(os.path.sep + os.path.sep + "a" + os.path.sep + "b")
+        drive, components = get_path_components(os.path.sep + "a" + os.path.sep + "b")
         print((drive, components))
         assert drive == ""
         assert components == ["a", "b"]

@@ -35,6 +35,15 @@ from os import path, getcwd, walk
 from fnmatch import fnmatch, filter as fnfilter
 from itertools import chain
 from collections import defaultdict
+import sys
+
+PY3 = sys.version_info[0] == 3
+
+if PY3:
+    STRING_TYPES = (str, )
+else:
+    STRING_TYPES = (basestring, )
+
 
 def get_version():
     """Returns the version of formic.
@@ -44,7 +53,7 @@ def get_version():
     try:
         # Try with the package manager, if present
         from pkg_resources import resource_string
-        return resource_string(__name__, "VERSION.txt")
+        return resource_string(__name__, "VERSION.txt").decode('utf8')
     except:
         # If the package manager is not present, try reading the file
         version = path.join(path.dirname(__file__), "VERSION.txt")
@@ -1114,8 +1123,8 @@ class FileSet(object):
         into a list of Pattern objects."""
         pattern_set = PatternSet()
         if argument is not None:
-            if not hasattr(argument, "__iter__"):
-                argument = [ argument ]
+            if isinstance(argument, STRING_TYPES):
+                argument = [argument, ]
 
             for glob in argument:
                 if isinstance(glob, str):
@@ -1224,6 +1233,9 @@ class FileSet(object):
                 return next(self.generator)
             def __str__(self):
                 return "FileSetIterator on {0}".format(self.file_set)
+        # for py2, need method `next` instend of `__next__`
+        if not PY3:  
+            FileSetIterator.next = lambda self: self.__next__()
         return FileSetIterator(self)
 
     def __str__(self):
