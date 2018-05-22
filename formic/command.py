@@ -15,8 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ###############################################################################
-
-"""The command-line glue-code for :command:`formic`. Call :func:`~formic.command.main()`
+"""The command-line glue-code for :command:`formic`. Call :func:`formic.command.main()`
 with the command-line arguments.
 
 Full usage of the command is::
@@ -53,8 +52,8 @@ Full usage of the command is::
 """
 
 from argparse import ArgumentParser, SUPPRESS, RawDescriptionHelpFormatter
-from sys import argv, stdout
-from os import path
+import sys
+import os
 from pkg_resources import resource_string
 from .formic import FileSet, FormicError, get_version
 
@@ -72,46 +71,79 @@ under certain conditions; for details, run
 
 Formic is Copyright (C) 2012, Aviser LLP, Singapore"""
 
+
 def create_parser():
     """Creates and returns the command line parser, an
      :class:`argparser.ArgumentParser` instance."""
-    parser = ArgumentParser(formatter_class=RawDescriptionHelpFormatter,
-                            description=DESCRIPTION,
-                            epilog=EPILOG,
-                            add_help=False)
+    parser = ArgumentParser(
+        formatter_class=RawDescriptionHelpFormatter,
+        description=DESCRIPTION,
+        epilog=EPILOG,
+        add_help=False)
 
     directory = parser.add_argument_group("Directory")
-    directory.add_argument(dest='directory', action="store", default=None, nargs="?",
-                           help="The directory from which to start the search "
-                                "(defaults to current working directory)")
+    directory.add_argument(
+        dest='directory',
+        action="store",
+        default=None,
+        nargs="?",
+        help="The directory from which to start the search "
+        "(defaults to current working directory)")
 
     globs = parser.add_argument_group("Globs")
-    globs.add_argument('-i', '--include', action="store", nargs="*",
-                           help="One or more Ant-like globs in include in the search."
-                                "If not specified, then all files are implied")
-    globs.add_argument('-e', '--exclude', action="store", nargs="*",
-                           help="One or more Ant-like globs in include in the search")
-    globs.add_argument('--no-default-excludes', dest="default_excludes",
-                       action="store_false", default=True,
-                       help="Do not include the default excludes")
-    globs.add_argument('--no-symlinks', action="store_true", default=False,
-                       help="Do not include symlinks")
-
+    globs.add_argument(
+        '-i',
+        '--include',
+        action="store",
+        nargs="*",
+        help="One or more Ant-like globs in include in the search."
+        "If not specified, then all files are implied")
+    globs.add_argument(
+        '-e',
+        '--exclude',
+        action="store",
+        nargs="*",
+        help="One or more Ant-like globs in include in the search")
+    globs.add_argument(
+        '--no-default-excludes',
+        dest="default_excludes",
+        action="store_false",
+        default=True,
+        help="Do not include the default excludes")
+    globs.add_argument(
+        '--no-symlinks',
+        action="store_true",
+        default=False,
+        help="Do not include symlinks")
 
     output = parser.add_argument_group("Output")
-    output.add_argument('-r', '--relative', action="store_true", default=False,
-                        help="Print file paths relative to directory.")
-
+    output.add_argument(
+        '-r',
+        '--relative',
+        action="store_true",
+        default=False,
+        help="Print file paths relative to directory.")
 
     info = parser.add_argument_group("Information")
-    info.add_argument('-h', '--help', action='store_true', default=False,
-                      help="Prints this help and exits")
-    info.add_argument('--usage', action='store_true', default=False,
-                      help="Prints additional help on globs and exits")
-    info.add_argument('--version', action='store_true', default=False,
-                      help="Prints the version of formic and exits")
+    info.add_argument(
+        '-h',
+        '--help',
+        action='store_true',
+        default=False,
+        help="Prints this help and exits")
+    info.add_argument(
+        '--usage',
+        action='store_true',
+        default=False,
+        help="Prints additional help on globs and exits")
+    info.add_argument(
+        '--version',
+        action='store_true',
+        default=False,
+        help="Prints the version of formic and exits")
     info.add_argument('--license', action="store_true", help=SUPPRESS)
     return parser
+
 
 def main(*kw):
     """Command line entry point; arguments must match those defined in
@@ -203,11 +235,12 @@ API, for example::
         print(resource_string(__name__, "LICENSE.txt"))
     else:
         try:
-            fileset = FileSet(directory=args.directory,
-                              include=args.include if args.include else ["*"],
-                              exclude=args.exclude,
-                              default_excludes=args.default_excludes,
-                              symlinks=not args.no_symlinks)
+            fileset = FileSet(
+                directory=args.directory,
+                include=args.include if args.include else ["*"],
+                exclude=args.exclude,
+                default_excludes=args.default_excludes,
+                symlinks=not args.no_symlinks)
         except FormicError as exception:
             parser.print_usage()
             print(exception.message)
@@ -216,23 +249,25 @@ API, for example::
         prefix = fileset.get_directory()
         for directory, file_name in fileset.files():
             if args.relative:
-                stdout.write(".")
+                sys.stdout.write(".")
             else:
-                stdout.write(prefix)
+                sys.stdout.write(prefix)
             if dir:
-                stdout.write(path.sep)
-                stdout.write(directory)
-            stdout.write(path.sep)
-            stdout.write(file_name)
-            stdout.write("\n")
+                sys.stdout.write(os.path.sep)
+                sys.stdout.write(directory)
+            sys.stdout.write(os.path.sep)
+            sys.stdout.write(file_name)
+            sys.stdout.write("\n")
 
     return 0
 
+
 def entry_point():
-    """Entry point for command line; calls :meth:`~formic.command.main()` and then
+    """Entry point for command line; calls :meth:`formic.command.main()` and then
     :func:`sys.exit()` with the return value."""
     result = main()
     exit(result)
 
+
 if __name__ == "__main__":
-    main(*argv[1:])
+    main(*sys.argv[1:])

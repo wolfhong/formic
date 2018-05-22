@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ###############################################################################
-
 """
 An implementation of Apache Ant globs.
 
@@ -24,4 +23,6 @@ An implementation of Apache Ant globs.
 * The :mod:`formic.command` module contains the command-line interface.
 """
 
-from .formic import FileSet, Pattern, get_version
+from .formic import FileSet, Pattern, get_version, FormicError
+
+__all__ = [FileSet, Pattern, get_version, FormicError]

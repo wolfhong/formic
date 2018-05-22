@@ -19,9 +19,11 @@
 from setuptools import setup
 from os import path
 
+
 def read(fname):
     """Loads the contents of a file, returning it as a string"""
     return open(path.join(path.dirname(__file__), fname)).read()
+
 
 setup(
     name='formic',
@@ -38,18 +40,15 @@ setup(
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "Topic :: Software Development :: Libraries",
-        ],
-    keywords=['Apache Ant', 'glob', 'recurse', 'FileSet', 'file utilities', 'find'],
+    ],
+    keywords=[
+        'Apache Ant', 'glob', 'recurse', 'FileSet', 'file utilities', 'find'
+    ],
     license='GPLv3+',
-
     packages=["formic"],
     package_data={"formic": ["*.txt"]},
-    zip_safe = True,
-
-    entry_points = {
-            'console_scripts': [
-                'formic  = formic.command:entry_point'
-            ],
+    zip_safe=True,
+    entry_points={
+        'console_scripts': ['formic  = formic.command:entry_point'],
     },
 )
-

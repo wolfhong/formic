@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ###############################################################################
-
 """An implementation of Ant Globs.
 
 The main entry points for this modules are:
@@ -31,11 +30,11 @@ The main entry points for this modules are:
 * :class:`Pattern`: An individual glob
 """
 
+import sys
 from os import path, getcwd, walk
 from fnmatch import fnmatch, filter as fnfilter
 from itertools import chain
 from collections import defaultdict
-import sys
 
 PY3 = sys.version_info[0] == 3
 
@@ -53,12 +52,13 @@ def get_version():
     try:
         # Try with the package manager, if present
         from pkg_resources import resource_string
-        return resource_string(__name__, "VERSION.txt").decode('utf8')
+        return resource_string(__name__, "VERSION.txt").decode('utf8').strip()
     except:
         # If the package manager is not present, try reading the file
         version = path.join(path.dirname(__file__), "VERSION.txt")
         with open(version, "r") as f:
-            return f.readlines()[0]
+            return f.readlines()[0].strip()
+
 
 def get_path_components(directory):
     """Breaks a path to a directory into a (drive, list-of-folders) tuple
@@ -78,6 +78,7 @@ def get_path_components(directory):
     folders.reverse()
     return drive, folders
 
+
 def reconstitute_path(drive, folders):
     """Reverts a tuple from `get_path_components` into a path.
 
@@ -89,6 +90,7 @@ def reconstitute_path(drive, folders):
     reconstituted = path.join(drive, path.sep, *folders)
     return reconstituted
 
+
 def is_root(directory):
     """Returns true if the directory is root (eg / on UNIX or c:\\ on Windows)"""
     _, folders = get_path_components(directory)
@@ -96,8 +98,11 @@ def is_root(directory):
 
 
 FILE_MARKER = object()
+
+
 def list_to_tree(files):
     """Converts a list of filenames into a directory tree structure."""
+
     def attach(branch, trunk):
         '''
         Insert a branch of directories on its trunk.
@@ -108,25 +113,28 @@ def list_to_tree(files):
         else:
             node, others = parts
             if node not in trunk:
-                trunk[node] = defaultdict(dict, ((FILE_MARKER, []),))
+                trunk[node] = defaultdict(dict, ((FILE_MARKER, []), ))
             attach(others, trunk[node])
-    tree = defaultdict(dict, ((FILE_MARKER, []),))
+
+    tree = defaultdict(dict, ((FILE_MARKER, []), ))
     for line in files:
         attach(line, tree)
     return tree
+
 
 def tree_walk(directory, tree):
     """Walks a tree returned by list_to_tree returning a list of
     3-tuples as if from os.walk()."""
     results = []
-    dirs    = [ dir for dir in tree if dir != FILE_MARKER ]
-    files   = tree[FILE_MARKER]
-    results.append( (directory, dirs, files) )
-    for dir in dirs:
-        subdir = path.join(directory, dir)
-        subtree = tree[dir]
+    dirs = [d for d in tree if d != FILE_MARKER]
+    files = tree[FILE_MARKER]
+    results.append((directory, dirs, files))
+    for d in dirs:
+        subdir = path.join(directory, d)
+        subtree = tree[d]
         results.extend(tree_walk(subdir, subtree))
     return results
+
 
 def walk_from_list(files):
     """A function that mimics :func:`os.walk()` by simulating a directory with
@@ -137,12 +145,16 @@ def walk_from_list(files):
              containing only the files listed in the argument
     """
     tree = list_to_tree(files)
+
     def walk(directory):
         return tree_walk(directory, tree)
+
     return walk
+
 
 class FormicError(Exception):
     """Formic errors, such as misconfigured arguments and internal exceptions"""
+
     def __init__(self, message=None):
         super(FormicError, self).__init__(message)
 
@@ -154,6 +166,7 @@ class Matcher(object):
 
     The :meth:`Matcher.create()` method is a Factory that creates instances of
     various subclasses."""
+
     @staticmethod
     def create(pattern):
         """Factory for :class:`Matcher` instances; returns a :class:`Matcher`
@@ -165,7 +178,7 @@ class Matcher(object):
 
     def __init__(self, pattern):
         self.pattern = path.normcase(pattern)
-        self.pp      = pattern
+        self.pp = pattern
 
     def match(self, _):
         """:class:`Matcher` is an abstract class - this will raise a
@@ -173,12 +186,12 @@ class Matcher(object):
         raise FormicError("Match should not be directly constructed")
 
     def __eq__(self, other):
-        return (isinstance(other, type(self)) and
-                self.pattern == other.pattern)
+        return (isinstance(other, type(self))
+                and self.pattern == other.pattern)
 
     def __ne__(self, other):
-        return (not isinstance(other, type(self)) or
-                self.pattern != other.pattern)
+        return (not isinstance(other, type(self))
+                or self.pattern != other.pattern)
 
     def __hash__(self):
         return self.pattern.__hash__()
@@ -199,6 +212,7 @@ class FNMatcher(Matcher):
 
     :class:`FNMatcher` internally uses :func:`fnmatch.fnmatch()` to implement
     :meth:`Matcher.match`"""
+
     def __init__(self, pattern):
         super(FNMatcher, self).__init__(pattern)
 
@@ -212,6 +226,7 @@ class ConstantMatcher(Matcher):
 
     This is used to more efficiently match path and file elements that
     do not have a wild-card, eg ``__init__.py``"""
+
     def __init__(self, pattern):
         super(ConstantMatcher, self).__init__(pattern)
 
@@ -234,11 +249,12 @@ class Section(object):
     2. ``Section(["sub"])``
     3. ``Section(["end"])``
     """
+
     def __init__(self, elements):
         assert elements
-        self.elements    = []
+        self.elements = []
         self.bound_start = False
-        self.bound_end   = False
+        self.bound_end = False
         for element in elements:
             self.elements.append(Matcher.create(element))
         self.length = len(self.elements)
@@ -302,7 +318,6 @@ class Section(object):
             if matched:
                 yield index + self.length
 
-
     def _match_iter_single(self, path_elements, start_at):
         """Implementation of match_iter optimized for self.elements of length 1"""
 
@@ -358,17 +373,17 @@ class MatchType(object):
 
     The various match possibilities are bitfields using the members
     starting ``BIT_``."""
-    BIT_MATCH              = 1 # M
-    BIT_ALL_SUBDIRECTORIES = 2 # A
-    BIT_NO_SUBDIRECTORIES  = 4 # N
+    BIT_MATCH =              1  # M
+    BIT_ALL_SUBDIRECTORIES = 2  # A
+    BIT_NO_SUBDIRECTORIES =  4  # N
 
     # The Match types             -BIT FIELDS-
     #                             X  M   A   N
-    NO_MATCH                    = 0
-    MATCH                       =    1
-    MATCH_ALL_SUBDIRECTORIES    =    1 | 2
+    NO_MATCH =                    0
+    MATCH =                          1
+    MATCH_ALL_SUBDIRECTORIES =       1 | 2
     MATCH_BUT_NO_SUBDIRECTORIES =    1     | 4
-    NO_MATCH_NO_SUBDIRECTORIES  =            4
+    NO_MATCH_NO_SUBDIRECTORIES =             4
 
 
 class Pattern(object):
@@ -419,8 +434,8 @@ class Pattern(object):
         for element in elements:
             if element == "..":
                 raise FormicError("Invalid glob:"
-                                  " Cannot have '..' in a glob: {0}".
-                                    format("/".join(elements)))
+                                  " Cannot have '..' in a glob: {0}".format(
+                                      "/".join(elements)))
             elif element == ".":
                 # . in a path does not do anything
                 pass
@@ -449,9 +464,9 @@ class Pattern(object):
 
     def __init__(self, elements):
         self.sections = []
-        self.str      = []
+        self.str = []
 
-        self.bound_start = elements[0]  != "**"
+        self.bound_start = elements[0] != "**"
 
         if elements[-1] != "**":
             # Patterns like "constant", "cons*" or "c?nst?nt"
@@ -547,7 +562,8 @@ class Pattern(object):
                         # If, however, the element's don't match, then no further match is possible,
                         # So return NO_MATCH_NO_SUBDIRECTORIES
                         if section.length > len(path_elements) > 0:
-                            if not section.elements[len(path_elements)-1].match(path_elements[-1]):
+                            if not section.elements[len(path_elements) - 1].match(
+                                                    path_elements[-1]):
                                 return MatchType.NO_MATCH_NO_SUBDIRECTORIES
                         return MatchType.NO_MATCH
                 else:
@@ -597,20 +613,20 @@ class Pattern(object):
         Both *matched* and *unmatched* are sets of string, the strings
         being unqualified file names"""
         this_match = set(self.file_filter(unmatched))
-        matched   |= this_match
+        matched |= this_match
         unmatched -= this_match
 
     def _to_string(self):
         """Implemented a function for __str__ and __repr__ to use, but
         which prevents infinite recursion when migrating to Python 3"""
         if self.sections:
-            start    = "/" if self.bound_start else "**/"
+            start = "/" if self.bound_start else "**/"
             sections = "/**/".join(str(section) for section in self.sections)
-            end      = "" if self.bound_end else "/**"
+            end = "" if self.bound_end else "/**"
         else:
-            start    = ""
+            start = ""
             sections = ""
-            end      = "" if self.bound_end else "**"
+            end = "" if self.bound_end else "**"
         return "{0}{1}{2}/{3}".format(start, sections, end, str(self.file_pattern))
 
     def __repr__(self):
@@ -618,6 +634,7 @@ class Pattern(object):
 
     def __str__(self):
         return self._to_string()
+
 
 class PatternSet(object):
     """A set of :class:`Pattern` instances; :class:`PatternSet` provides
@@ -627,8 +644,9 @@ class PatternSet(object):
     is an integral part of various optimizations in :class:`FileSet`.
 
     This class is *not* an implementation of Apache Ant PatternSet"""
+
     def __init__(self):
-        self.patterns   = []
+        self.patterns = []
         self._all_files = False
 
     def _compute_all_files(self):
@@ -705,9 +723,8 @@ class PatternSet(object):
                 yield pattern
 
     def __str__(self):
-        return ("PatternSet (All files? {0}) [{1}] ".
-                    format(self.all_files(),
-                           ", ".join(str(pat) for pat in self.patterns)))
+        return ("PatternSet (All files? {0}) [{1}] ".format(
+            self.all_files(), ", ".join(str(pat) for pat in self.patterns)))
 
 
 class FileSetState(object):
@@ -766,6 +783,7 @@ class FileSetState(object):
           In this case it is removed from all :class:`PatternSet` members
           in this instance.
     """
+
     def __init__(self, label, directory, based_on=None, unmatched=None):
         self.label = label
         if directory:
@@ -781,21 +799,21 @@ class FileSetState(object):
         else:
             self.parent = None
 
-
         # If we have found a parent, copy the parent's computations here
         # as the start. This is a significant optimization by caching
         # as many directory matches as possible
-        self.matched_inherit    = PatternSet() # Matches this directory and all sub
-        self.matched_and_subdir = PatternSet() # Matches this directory and poss. sub
-        self.matched_no_subdir  = PatternSet() # Matches this directory, discard for sub
-        self.unmatched          = PatternSet() # Does no match this directory. but poss. sub
+        self.matched_inherit = PatternSet()  # Matches this directory and all sub
+        self.matched_and_subdir = PatternSet()  # Matches this directory and poss. sub
+        self.matched_no_subdir = PatternSet()  # Matches this directory, discard for sub
+        self.unmatched = PatternSet()  # Does no match this directory. but poss. sub
         if self.parent:
             self.unmatched.extend(self.parent.matched_and_subdir)
             self.unmatched.extend(self.parent.unmatched)
             # parent_has_patterns is True if _any_ parent up to root has
             # cached a pattern in matched_inherit
-            self.parent_has_patterns = (self.parent.parent_has_patterns or
-                                        not self.parent.matched_inherit.empty())
+            self.parent_has_patterns = (
+                self.parent.parent_has_patterns
+                or not self.parent.matched_inherit.empty())
         else:
             # This branch exercised only when constructing the root
             self.parent_has_patterns = False
@@ -860,15 +878,15 @@ class FileSetState(object):
         if not files:
             return set()
 
-        if (self.matched_inherit.all_files() or
-           self.matched_and_subdir.all_files() or
-           self.matched_no_subdir.all_files()):
+        if (self.matched_inherit.all_files()
+                or self.matched_and_subdir.all_files()
+                or self.matched_no_subdir.all_files()):
             # Optimization: one of the matched patterns matches everything
             # So simply return it
             return set(files)
 
         unmatched = set(files)
-        matched   = set()
+        matched = set()
         for pattern_set in self._matching_pattern_sets():
             pattern_set.match_files(matched, unmatched)
             if not unmatched:
@@ -895,24 +913,20 @@ class FileSetState(object):
 
         When this :class:FileSetState is used for an 'include', a return of
         `True` means we can exclude all subdirectories."""
-        return (not self.parent_has_patterns and
-                   self.matched_inherit.empty() and
-                   self.matched_and_subdir.empty() and
-                   self.unmatched.empty())
+        return (not self.parent_has_patterns and self.matched_inherit.empty()
+                and self.matched_and_subdir.empty() and self.unmatched.empty())
 
     def __str__(self):
         return ("FileSetState {0} in {1}/:\n"
-               "\tInherit: {2}\n"
-               "\tthis&subdir: {3}\n"
-               "\tthis-only: {4}\n"
-               "\tunmatched: {5}".format(
-                    self.label,
-                    "/".join(self.path_elements),
-                    self.matched_inherit,
-                    self.matched_and_subdir,
-                    self.matched_no_subdir,
-                    self.unmatched
-                ))
+                "\tInherit: {2}\n"
+                "\tthis&subdir: {3}\n"
+                "\tthis-only: {4}\n"
+                "\tunmatched: {5}".format(self.label, "/".join(
+                    self.path_elements), self.matched_inherit,
+                                         self.matched_and_subdir,
+                                         self.matched_no_subdir,
+                                         self.unmatched))
+
 
 def get_initial_default_excludes():
     """Returns a the default excludes as a list of Patterns.
@@ -952,8 +966,7 @@ def get_initial_default_excludes():
         * \*\*/.bzr/\*\*/\*
         * \*\*/.bzrignore
      """
-    return [ Pattern.create(exclude) for exclude in
-'''**/__pycache__/**/*
+    return [Pattern.create(exclude) for exclude in '''**/__pycache__/**/*
 **/*~
 **/#*#
 **/.#*
@@ -982,7 +995,7 @@ def get_initial_default_excludes():
 **/.bzr
 **/.bzr/**/*
 **/.bzrignore
-'''.splitlines() ]
+'''.splitlines()]
 
 
 class FileSet(object):
@@ -1102,11 +1115,11 @@ class FileSet(object):
                  walk=walk,
                  symlinks=True):
 
-        self.include  = FileSet._preprocess(include)
+        self.include = FileSet._preprocess(include)
         if not self.include:
             raise FormicError("No include globs have been specified"
                               "- nothing to find")
-        self.exclude  = FileSet._preprocess(exclude)
+        self.exclude = FileSet._preprocess(exclude)
         self.symlinks = symlinks
         self.walk = walk
         if default_excludes:
@@ -1115,7 +1128,7 @@ class FileSet(object):
             self.directory = None
         else:
             self.directory = path.abspath(directory)
-        self._received = 0 # Used for testing
+        self._received = 0  # Used for testing
 
     @staticmethod
     def _preprocess(argument):
@@ -1155,17 +1168,15 @@ class FileSet(object):
 
         if not self.symlinks:
             where = root + path.sep + directory + path.sep
-            files = [ file_name for file_name in files
-                        if not path.islink(where + file_name) ]
+            files = [
+                file_name for file_name in files
+                if not path.islink(where + file_name)
+            ]
 
-        include = FileSetState("Include",
-                               directory,
-                               include,
-                               None if include else self.include)
-        exclude = FileSetState("Exclude",
-                               directory,
-                               exclude,
-                               None if exclude else self.exclude)
+        include = FileSetState("Include", directory, include, None
+                               if include else self.include)
+        exclude = FileSetState("Exclude", directory, exclude, None
+                               if exclude else self.exclude)
 
         if exclude.matches_all_files_all_subdirs():
             # Exclude everything and do no traverse any subdirectories
@@ -1173,9 +1184,9 @@ class FileSet(object):
             matched = set()
         else:
             if include.no_possible_matches_in_subdirs():
-            # Do no traverse any subdirectories
+                # Do no traverse any subdirectories
                 del dirs[0:]
-            matched  = include.match(set(files))
+            matched = include.match(set(files))
             matched -= exclude.match(matched)
 
         return matched, include, exclude
@@ -1197,12 +1208,8 @@ class FileSet(object):
         for root, dirs, files in self.walk(directory):
             # Remove the constant part of the path inluding the first path sep
             rel_dir_name = root[prefix:]
-            matched, include, exclude = self._receive(directory,
-                                                      rel_dir_name,
-                                                      dirs,
-                                                      files,
-                                                      include,
-                                                      exclude)
+            matched, include, exclude = self._receive(
+                directory, rel_dir_name, dirs, files, include, exclude)
             for file_name in matched:
                 yield rel_dir_name, file_name
 
@@ -1220,21 +1227,27 @@ class FileSet(object):
         """A natural iteration of files in the set.
 
         Files returned are relative, as if iterating ``self.qualified_files()``"""
+
         class FileSetIterator(object):
             """Gluecode class to return a lazy iterator over the fileset"""
+
             def __init__(self, file_set):
                 self.file_set = file_set
                 self.generator = None
+
             def __iter__(self):
                 return self
+
             def __next__(self):
                 if self.generator is None:
                     self.generator = self.file_set.qualified_files()
                 return next(self.generator)
+
             def __str__(self):
                 return "FileSetIterator on {0}".format(self.file_set)
+
         # for py2, need method `next` instend of `__next__`
-        if not PY3:  
+        if not PY3:
             FileSetIterator.next = lambda self: self.__next__()
         return FileSetIterator(self)
 

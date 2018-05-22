@@ -1,6 +1,14 @@
 Changelog
 =========
 
+1.0
+----
+
+New feature:
+
+* Add supports for both Python3 and Python2.
+* Keep all the interface consistent with the 0.9beta8.
+
 0.9beta8
 --------
 

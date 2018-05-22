@@ -6,16 +6,16 @@ Prequisites
 
 Platform and dependencies:
 
-* Formic requires Python 2.7
+* Formic requires Python 2.7+ or Python3.4+
 * It has been tested on
 
   * Mac OS X (Lion and Mountain Lion)
   * Ubuntu 11.10 and 12.04LTS
-  * Windows XP and Windows 7 (Home Premium).
+  * Windows XP, Windows 7 (Home Premium) and Windows 10.
 
-Formic should work on any Python 2.7 system; if not, please contact the
+Formic can work on any Python 2.7 or Python 3.4+ system; if not, please contact the
 maintainer or `file an issue
-<https://bitbucket.org/aviser/formic/issues/new>`_.
+<https://github.com/wolfhong/formic/issues/new>`_.
 
 Formic has no runtime dependencies outside the Python system libraries.
 
@@ -29,11 +29,11 @@ and complexity. You need only pick one:
 
 Simplest: use::
 
-    $ easy_install formic
+    $ easy_install formic2
 
 or::
 
-    $ pip install formic
+    $ pip install formic2
 
 **Option 2: Source install**
 
