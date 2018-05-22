@@ -1,0 +1,4 @@
+include *.rst
+include formic/*.txt
+include coveragerc
+recursive-include doc *.rst *.css *.py

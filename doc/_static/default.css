@@ -1,0 +1,305 @@
+/*
+ * formic.css
+ * ~~~~~~~~~~
+ *
+ * Based on: Sphinx stylesheet -- default theme.
+ * :copyright: Copyright 2007-2011 by the Sphinx team, see AUTHORS.
+ * :license: BSD, see LICENSE for details.
+ *
+ * Modified by Andrew Alcock, Aviser LLP
+ */
+
+@import url("basic.css");
+
+/* -- page layout ----------------------------------------------------------- */
+
+body {
+    font-family: Ubuntu, 'Avenir Next', 'Trebuchet MS', sans-serif;
+    font-size: 13px;
+    background-color: #FAFAFA;
+    color: #5f5f5f;
+    margin: 0;
+    padding: 0;
+}
+
+div.documentwrapper {
+    float: left;
+    width: 100%;
+}
+
+div.bodywrapper {
+    margin: 0 0 0 230px;
+}
+
+div.body {
+    padding: 0 20px 30px 20px;
+}
+
+div.section {
+    padding-left: 10px;
+}
+
+div.footer {
+    width: 100%;
+    padding: 9px 0 9px 0;
+    text-align: center;
+    font-size: 75%;
+}
+
+/* -- Logo overlay    ---------------------------------------------- */
+
+.logo-position {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.logo {
+    margin: 10px 0px 10px 33px;
+    padding: 0px 0px 0px 0px;
+}
+
+/* -- Masthead/footer ---------------------------------------------- */
+
+div.related {
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 19px;
+    color: #999;
+    background-color: #F5F5F5;
+    border-bottom: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: #DDD;
+    min-height: 75px;
+    margin-bottom: 15px;
+}
+
+div.related ul {
+    padding-left: 260px;
+}
+
+div.related a {
+    color: #5CA200;
+    padding-bottom: 29px;
+    padding-top: 27px;
+    padding-left: 10px;
+    padding-right: 10px;
+    display: block;
+}
+
+/* -- Sidebar ------------------------------------------------------ */
+
+div.sphinxsidebar {
+    margin-top: 0px;
+}
+
+div.sphinxsidebarwrapper {
+    background-color: #f4fef3;
+    border: 1px solid #8eb85c;
+    margin: 2px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    box-shadow: 3px 3px 5px 0 #aaa;
+}
+
+
+div.sphinxsidebar h3 {
+    color: #3a6708;
+    font-size: 140%;
+    font-weight: normal;
+    margin: 0;
+    padding: 0;
+}
+
+div.sphinxsidebar h4 {
+    color: #3a6708;
+    font-size: 130%;
+    font-weight: normal;
+    margin: 5px 0 0 0;
+    padding: 0;
+}
+
+div.sphinxsidebar p {
+    color: #3a6708;
+}
+
+div.sphinxsidebar p.topless {
+    margin: 5px 10px 10px 10px;
+}
+
+div.sphinxsidebar ul {
+    margin: 10px;
+    padding: 0;
+    color: #569409;
+}
+
+div.sphinxsidebar a {
+    color: #3a6708;
+}
+
+div.sphinxsidebar form {
+}
+
+div.sphinxsidebar input {
+    border: 1px solid #45a600;
+}
+
+
+
+/* -- hyperlink styles ------------------------------------------------------ */
+
+a {
+    color: #4f8f00;
+    text-decoration: none;
+}
+
+a:visited {
+    color: #3a6708;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* -- body styles ----------------------------------------------------------- */
+
+div.body h1,
+div.body h2 {
+    letter-spacing: -1px;
+}
+
+div.body h1,
+div.body h2,
+div.body h3,
+div.body h4,
+div.body h5,
+div.body h6 {
+    font-weight: normal;
+    color: #484848;
+    margin: 10px 0px 0px 0px;
+}
+
+div.body h1 { margin-top: 0; font-size: 200%; }
+div.body h2 { font-size: 160%; }
+div.body h3 { font-size: 140%; }
+div.body h4 { font-size: 120%; }
+div.body h5 { font-size: 110%; }
+div.body h6 { font-size: 100%; }
+
+div.body p, div.body dd, div.body li {
+    text-align: justify;
+    line-height: 130%;
+}
+
+div.admonition p.admonition-title + p {
+    display: inline;
+}
+
+div.admonition p {
+    margin-bottom: 5px;
+}
+
+div.admonition pre {
+    margin-bottom: 5px;
+}
+
+div.admonition ul, div.admonition ol {
+    margin-bottom: 5px;
+}
+
+div.note {
+    background-color: #eee;
+    border: 1px solid #ccc;
+}
+
+div.seealso {
+    background-color: #ffc;
+    border: 1px solid #ff6;
+}
+
+div.topic {
+    background-color: #eee;
+}
+
+div.warning {
+    background-color: #ffe4e4;
+    border: 1px solid #f66;
+}
+
+p.admonition-title {
+    display: inline;
+}
+
+p.admonition-title:after {
+    content: ":";
+}
+
+pre {
+    font-family: 'Lucida Console', 'monospace';
+    font-size: 80%;
+    padding: 5px;
+    background-color: #f5f5f5;
+    color: #323233;
+    line-height: 140%;
+    border: 1px solid #4f8f00;
+    border-left: none;
+    border-right: none;
+}
+
+tt {
+    background-color: #ecf0f3;
+    padding: 0 1px 0 1px;
+    font-size: 100%;
+}
+
+th {
+    background-color: #ede;
+}
+
+.warning tt {
+    background: #efc2c2;
+}
+
+.note tt {
+    background: #d6d6d6;
+}
+
+.viewcode-back {
+}
+
+div.viewcode-block:target {
+    background-color: #f4debf;
+    border-top: 1px solid #aacc99;
+    border-bottom: 1px solid #ac9;
+}
+
+/* -- API doc ----------------------------------------------------------- */
+
+dl.class {
+    border: 1px solid #dee5df;
+    background-color: #ffffff;
+    padding: 5px 10px 0px 5px;
+    box-shadow: 3px 3px 5px 0px #bed4c0;
+}
+
+dl.exception {
+    border: 1px solid #ffe5e5;
+    background-color: #fff8f8;
+    padding: 5px 10px 0 5px;
+    box-shadow: 3px 3px 5px 0 #c0a0a0;
+}
+
+dl.function {
+    border: 1px solid #DFDFCA;
+    background-color: #FDFDF2;
+    padding: 5px 10px 0 5px;
+    box-shadow: 3px 3px 5px 0 #aaa;
+}
+ol {
+    margin-bottom: 16px;
+}
+ul {
+    margin-bottom: 16px;
+}
+

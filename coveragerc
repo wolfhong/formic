@@ -1,0 +1,21 @@
+# coverage control file
+[run]
+branch = True
+source = formic.py, command.py
+omit = test_*
+
+[report]
+# Regexes for lines to exclude from consideration
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    if 0:
+    if __name__ == .__main__.:
+
+ignore_errors = True
+
+[html]
+directory = ../build/coverage/htmlcov
+
+[xml]
+output = ../build/coverage/coverage.xml
