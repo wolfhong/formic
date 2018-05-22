@@ -71,16 +71,14 @@ the word 'test', and any files that start `test_`.
 
 Or integrated right into your Python project::
 
-```python
-import formic
-fileset = formic.FileSet(include="**.py",
-                         exclude=["**/*test*/**", "test_*"]
-                         )
+    import formic
+    fileset = formic.FileSet(include="**.py",
+                             exclude=["**/*test*/**", "test_*"]
+                             )
 
-for file_name in fileset:
-    # Do something with file_name
-    ...
-```
+    for file_name in fileset:
+        # Do something with file_name
+        ...
 
 That's about it :)
 
