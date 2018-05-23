@@ -234,7 +234,7 @@ API, for example::
     $ formic -i "*.py" -e "__init__.py" "**/*test*/" "test_*" --no-default-excludes
 """)
     elif args.version:
-        print("formic", get_version(), "http://www.aviser.asia/formic")
+        print("formic", get_version())
     elif args.license:
         print(resource_string(__name__, "LICENSE.txt"))
     else:

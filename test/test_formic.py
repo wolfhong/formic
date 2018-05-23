@@ -1150,7 +1150,7 @@ class TestFileSet(object):
 
 class TestMiscellaneous(object):
     def test_version(self):
-        assert "1.0" == get_version()
+        assert "1.0.1" == get_version()
 
     def test_rooted(self):
         curdir = os.getcwd()

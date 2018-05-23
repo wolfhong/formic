@@ -46,6 +46,13 @@ Or integrated right into your Python project::
         # Do something with file_name
         ...
 
+Formic is always case-insensitive::
+
+    $ formic ./test/ -i "upper*" "upper*/"
+    /some/where/formic/test/lower/UPPER.txt
+    /some/where/formic/test/UPPER/lower.txt
+    /some/where/formic/test/UPPER/UPPER.txt
+
 That's about it :)
 
 Features

@@ -26,30 +26,31 @@ def read(fname):
 
 
 setup(
-    name='formic',
+    name='formic2',
     version=read(path.join("formic", "VERSION.txt")),
     description='An implementation of Apache Ant FileSet and Globs',
     long_description=read("README.rst"),
-    author='Aviser LLP, Singapore',
-    author_email='formic@aviser.asia',
-    url='http://www.aviser.asia/formic',
+    author='Aviser LLP, Singapore; wolfhong',
+    author_email='hongxucai1991@gmail.com',
+    url='https://github.com/wolfhong/formic',
     classifiers=[
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.6+",
-        "Programming Language :: Python :: 3.4+",
+        "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 3",
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "Topic :: Software Development :: Libraries",
+        "Topic :: Utilities",
     ],
     keywords=[
         'Apache Ant', 'glob', 'recurse', 'FileSet', 'file utilities', 'find', 'fnmatcher'
     ],
     license='GPLv3+',
     packages=["formic"],
+    python_requires='>=2.6, <4',
     package_data={"formic": ["*.txt"]},
-    zip_safe=True,
     entry_points={
-        'console_scripts': ['formic  = formic.command:entry_point'],
+        'console_scripts': ['formic = formic.command:entry_point'],
     },
 )
