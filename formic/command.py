@@ -55,7 +55,11 @@ from argparse import ArgumentParser, SUPPRESS, RawDescriptionHelpFormatter
 import sys
 import os
 from pkg_resources import resource_string
-from .formic import FileSet, FormicError, get_version
+
+if __name__ == "__main__":
+    from formic import FileSet, FormicError, get_version
+else:
+    from .formic import FileSet, FormicError, get_version
 
 DESCRIPTION = """Search the file system using Apache Ant globs"""
 
@@ -252,7 +256,7 @@ API, for example::
                 sys.stdout.write(".")
             else:
                 sys.stdout.write(prefix)
-            if dir:
+            if directory:
                 sys.stdout.write(os.path.sep)
                 sys.stdout.write(directory)
             sys.stdout.write(os.path.sep)

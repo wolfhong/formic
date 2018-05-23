@@ -38,8 +38,9 @@ Or integrated right into your Python project::
 
     import formic
     fileset = formic.FileSet(include="**.py",
-                             exclude=["**/*test*/**", "test_*"]
-                             )
+                             exclude=["**/*test*/**", "test_*"],
+                             directory="./",
+                             symlinks=False, )
 
     for file_name in fileset:
         # Do something with file_name
