@@ -167,7 +167,7 @@ def formic_count(directory, pattern):
         include="/**/" + pattern,
         default_excludes=False,
         symlinks=False)
-    lines = sum(1 for file in fs.files())
+    lines = sum(1 for f in fs.files())
     print("FileSet found", lines, "files")
     return lines
 
@@ -587,7 +587,7 @@ class TestPattern(object):
         assert p2.sections == p3.sections
         assert p1.bound_start is False
         assert p1.bound_start == p2.bound_start == p3.bound_start
-        assert p1.bound_end == True
+        assert p1.bound_end is True
         assert p1.bound_end == p2.bound_end == p3.bound_end
 
     def test_match_pure_file_pattern(self):
@@ -866,14 +866,14 @@ class TestFileSetState(object):
         unbound_all = Pattern.create("**/*")
         unbound_py = Pattern.create("**/*.py")
 
-        all = [
+        _all = [
             bound_start_top_all, bound_start_top_py, bound_start_sub_all,
             bound_start_sub_py, bound_end_all, bound_end_py, bound_start_end,
             unbound_all, unbound_py
         ]
 
         # Test matches for the root directory
-        fst = FileSetState("Label", "", None, all)
+        fst = FileSetState("Label", "", None, _all)
         file_set_state_location(fst, bound_start_top_all, UNMATCHED)
         file_set_state_location(fst, bound_start_top_py, UNMATCHED)
         file_set_state_location(fst, bound_start_sub_all, UNMATCHED)
@@ -897,14 +897,14 @@ class TestFileSetState(object):
         unbound_all = Pattern.create("**/*")
         unbound_py = Pattern.create("**/*.py")
 
-        all = [
+        _all = [
             bound_start_top_all, bound_start_top_py, bound_start_sub_all,
             bound_start_sub_py, bound_end_all, bound_end_py, bound_start_end,
             unbound_all, unbound_py
         ]
 
         # Test matches for the root directory
-        fst = FileSetState("Label", "test", None, all)
+        fst = FileSetState("Label", "test", None, _all)
         file_set_state_location(fst, bound_start_top_all, MATCHED_NO_SUBDIR)
         file_set_state_location(fst, bound_start_top_py, MATCHED_NO_SUBDIR)
         file_set_state_location(fst, bound_start_sub_all, MATCHED_INHERIT)
@@ -928,14 +928,14 @@ class TestFileSetState(object):
         unbound_all = Pattern.create("**/*")
         unbound_py = Pattern.create("**/*.py")
 
-        all = [
+        _all = [
             bound_start_top_all, bound_start_top_py, bound_start_sub_all,
             bound_start_sub_py, bound_end_all, bound_end_py, bound_start_end,
             unbound_all, unbound_py
         ]
 
         # Test matches for the root directory
-        fst = FileSetState("Label", "nottest", None, all)
+        fst = FileSetState("Label", "nottest", None, _all)
         file_set_state_location(fst, bound_start_top_all, NOT_PRESENT)
         file_set_state_location(fst, bound_start_top_py, NOT_PRESENT)
         file_set_state_location(fst, bound_start_sub_all, NOT_PRESENT)
@@ -955,13 +955,13 @@ class TestFileSetState(object):
         bound_start_sub_py = Pattern.create("/test/**/*.py")
         bound_start_end = Pattern.create("/test/**/test/*.py")
 
-        all = [
+        _all = [
             bound_start_top_all, bound_start_top_py, bound_start_sub_all,
             bound_start_sub_py, bound_start_end
         ]
 
         # Test matches for the root directory
-        fst = FileSetState("Label", "nottest", None, all)
+        fst = FileSetState("Label", "nottest", None, _all)
         file_set_state_location(fst, bound_start_top_all, NOT_PRESENT)
         file_set_state_location(fst, bound_start_top_py, NOT_PRESENT)
         file_set_state_location(fst, bound_start_sub_all, NOT_PRESENT)
@@ -1053,20 +1053,20 @@ class TestFileSet(object):
         definitive_count = find_count(root, "*.py")
 
         fs = FileSet(directory=root, include=pattern_py, symlinks=False)
-        files = [os.path.join(root, dir, file) for dir, file in fs.files()]
+        files = [os.path.join(root, _dir, _file) for _dir, _file in fs.files()]
         assert definitive_count == len(files)
-        assert [] == [file for file in files if not os.path.isfile(file)]
-        assert files == [file for file in files if file.endswith(".py")]
+        assert [] == [f for f in files if not os.path.isfile(f)]
+        assert files == [f for f in files if f.endswith(".py")]
 
         fs = FileSet(
             directory=root,
             include=pattern_all,
             exclude=[pattern_pyc, pattern_txt])
-        files = [os.path.join(root, dir, file) for dir, file in fs.files()]
+        files = [os.path.join(root, _dir, _file) for _dir, _file in fs.files()]
         assert definitive_count <= len(files)
-        assert [] == [file for file in files if not os.path.isfile(file)]
-        assert [] == [file for file in files if file.endswith(".pyc")]
-        assert [] == [file for file in files if file.endswith(".txt")]
+        assert [] == [f for f in files if not os.path.isfile(f)]
+        assert [] == [f for f in files if f.endswith(".pyc")]
+        assert [] == [f for f in files if f.endswith(".txt")]
 
     def test_bound_root(self):
         """Unit test to pick up Issue #1"""
@@ -1079,10 +1079,10 @@ class TestFileSet(object):
 
             fs = FileSet(include="/*.py", default_excludes=False)
             count = 0
-            for file in fs:
+            for _file in fs:
                 count += 1
-                print("File:", file)
-                head, tail = os.path.split(file)
+                print("File:", _file)
+                head, tail = os.path.split(_file)
                 assert curdir == head
                 assert tail in actual
                 assert tail.endswith(".py")
@@ -1117,7 +1117,7 @@ class TestFileSet(object):
         ]
 
         fileset = FileSet(include="*.py", walk=walk_from_list(files))
-        found = [(dir, file) for dir, file in fileset.files()]
+        found = [(_dir, _file) for _dir, _file in fileset.files()]
 
         assert len(found) == 2
         assert ("CVS", "error.py") not in found
@@ -1131,7 +1131,7 @@ class TestFileSet(object):
         ]
 
         fileset = FileSet(include="in/**/test/", walk=walk_from_list(files))
-        found = [(dir, file) for dir, file in fileset.files()]
+        found = [(_dir, _file) for _dir, _file in fileset.files()]
         assert len(found) == 3
         assert (os.path.join("in", "a", "b"), "test") in found
         assert (os.path.join("out", "a"), "test.py") not in found
@@ -1142,7 +1142,7 @@ class TestFileSet(object):
         ]
 
         fileset = FileSet(include="in/**/*test*/", walk=walk_from_list(files))
-        found = [(dir, file) for dir, file in fileset.files()]
+        found = [(_dir, _file) for _dir, _file in fileset.files()]
         assert len(found) == 3
         assert (os.path.join("in", "a", "b"), "4test4") in found
         assert (os.path.join("out", "a"), "test.py") not in found
@@ -1155,7 +1155,7 @@ class TestMiscellaneous(object):
     def test_rooted(self):
         curdir = os.getcwd()
         full = os.path.dirname(os.path.dirname(__file__))
-        drive, dir = os.path.splitdrive(full)
+        drive, _dir = os.path.splitdrive(full)
         wild = "**" + os.path.sep + "*.rst"
         os.chdir(full)
         try:
@@ -1168,7 +1168,7 @@ class TestMiscellaneous(object):
             relative = [filename for filename in FileSet(include=wild)]
             rooted = [
                 filename for filename in FileSet(
-                    include=os.path.join(dir, wild),
+                    include=os.path.join(_dir, wild),
                     directory=drive + os.path.sep)
             ]
             assert len(relative) == len(absolute) == len(rooted)
@@ -1181,7 +1181,6 @@ class TestMiscellaneous(object):
             os.chdir(curdir)
 
     def test_search_prune_efficiency(self):
-        curdir = os.getcwd()
         formic_root = os.path.dirname(os.path.dirname(__file__))
 
         print("Absolute, starting at ", formic_root)
@@ -1202,7 +1201,7 @@ class TestMiscellaneous(object):
 
     def test_filename_case(self):
         root = os.path.join(os.path.dirname(os.path.dirname(__file__)), "test")
-        for test in ["/lower/lower.txt", "lower/UPPER.txt", "UPPER/lower.txt",
+        for test in ["lower/lower.txt", "lower/UPPER.txt", "UPPER/lower.txt",
                      "UPPER/UPPER.txt"]:
             print("Testing", test)
             found = [f for f in FileSet(include=test, directory=root)]
@@ -1211,9 +1210,14 @@ class TestMiscellaneous(object):
 
         if os.name == "posix":
             for test in ["Formic.py", "VERSION.Txt"]:
-                print("Testing for non-match of", test)
+                print("POSIX testing for non-match of", test)
                 found = [f for f in FileSet(include=test, directory=root)]
                 assert len(found) == 0
+        elif os.name == "nt":
+            for test in ["Formic.py", "VERSION.Txt"]:
+                print("NT testing for match of", test)
+                found = [f for f in FileSet(include=test, directory=root)]
+                assert len(found) == 1
 
     def test_get_path_components(self):
         drive, components = get_path_components(os.path.join("a", "b", "c"))

@@ -53,7 +53,7 @@ def get_version():
         # Try with the package manager, if present
         from pkg_resources import resource_string
         return resource_string(__name__, "VERSION.txt").decode('utf8').strip()
-    except:
+    except Exception:
         # If the package manager is not present, try reading the file
         version = path.join(path.dirname(__file__), "VERSION.txt")
         with open(version, "r") as f:
@@ -485,7 +485,7 @@ class Pattern(object):
             self.file_filter = lambda files: fnfilter(files, self.file_pattern)
         else:
             # This is a 'constant' pattern - use comprehension
-            self.file_filter = lambda files: [ file for file in files if path.normcase(file) == self.file_pattern ]
+            self.file_filter = lambda files: [f for f in files if path.normcase(f) == self.file_pattern]
 
         if elements:
             self.bound_end = elements[-1] != "**"
@@ -1050,7 +1050,7 @@ class FileSet(object):
             prefix = fileset.get_directory()
             for directory, file_name in fileset.files():
                 sys.stdout.write(prefix)
-                if dir:
+                if directory:
                     sys.stdout.write(path.sep)
                     sys.stdout.write(directory)
                 sys.stdout.write(path.sep)
@@ -1121,7 +1121,7 @@ class FileSet(object):
                               "- nothing to find")
         self.exclude = FileSet._preprocess(exclude)
         self.symlinks = symlinks
-        self.walk = walk
+        self.walk_func = walk
         if default_excludes:
             self.exclude.extend(FileSet.DEFAULT_EXCLUDES)
         if directory is None:
@@ -1205,7 +1205,7 @@ class FileSet(object):
 
         include = None
         exclude = None
-        for root, dirs, files in self.walk(directory):
+        for root, dirs, files in self.walk_func(directory):
             # Remove the constant part of the path inluding the first path sep
             rel_dir_name = root[prefix:]
             matched, include, exclude = self._receive(

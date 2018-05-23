@@ -34,7 +34,13 @@ You can also find from the specified directory like below::
 
    $ formic /specified/directory/can/ignore/ -i "*.py" "**/test/**/*.txt" "*.ini"
 
-Or integrated right into your Python project::
+Output from Formic is formatted like the Unix find command, and so can easily be combined with other executables, eg::
+
+    $ formic -i "**/*.bak" | xargs rm
+
+will delete all `.bak` files in or under the current directory (but excluding VCS directories such as `.svn` and `.hg`).
+
+Formic can also be integrated right into your Python project::
 
     import formic
     fileset = formic.FileSet(include="**.py",
@@ -46,12 +52,16 @@ Or integrated right into your Python project::
         # Do something with file_name
         ...
 
-Formic is always case-insensitive::
+Formic is case-insensitive on NT, but case-sensitive on POSIX.
+
+On NT::
 
     $ formic ./test/ -i "upper*" "upper*/"
     /some/where/formic/test/lower/UPPER.txt
     /some/where/formic/test/UPPER/lower.txt
     /some/where/formic/test/UPPER/UPPER.txt
+
+On POSIX, nothing will be printed.
 
 That's about it :)
 
