@@ -21,34 +21,9 @@ with the command-line arguments.
 Full usage of the command is::
 
   usage: formic [-i [INCLUDE [INCLUDE ...]]] [-e [EXCLUDE [EXCLUDE ...]]]
-               [--no-default-excludes] [--no-symlinks] [-r] [-h] [--usage]
+               [--no-default-excludes] [--no-symlinks] [--insensitive] [-r] [-h] [--usage]
                [--version]
                [directory]
-
-  Search the file system using Apache Ant globs
-
-  Directory:
-    directory             The directory from which to start the search (defaults
-                          to current working directory)
-
-  Globs:
-    -i [INCLUDE [INCLUDE ...]], --include [INCLUDE [INCLUDE ...]]
-                          One or more Ant-like globs in include in the search.If
-                          not specified, then all files are implied
-    -e [EXCLUDE [EXCLUDE ...]], --exclude [EXCLUDE [EXCLUDE ...]]
-                          One or more Ant-like globs in include in the search
-    --no-default-excludes
-                          Do not include the default excludes
-    --no-symlinks         Do not include symlinks
-
-  Output:
-     -r, --relative       Print file paths relative to directory.
-
-  Information:
-    -h, --help            Prints this help and exits
-    --usage               Prints additional help on globs and exits
-    --version             Prints the version of formic and exits
-
 """
 
 from argparse import ArgumentParser, SUPPRESS, RawDescriptionHelpFormatter
@@ -119,6 +94,11 @@ def create_parser():
         action="store_true",
         default=False,
         help="Do not include symlinks")
+    globs.add_argument(
+        '--insensitive',
+        action="store_true",
+        default=False,
+        help="Turn off case-sensitive, default sensitive on POSIX, always insensitive on NT.")
 
     output = parser.add_argument_group("Output")
     output.add_argument(
@@ -244,7 +224,8 @@ API, for example::
                 include=args.include if args.include else ["*"],
                 exclude=args.exclude,
                 default_excludes=args.default_excludes,
-                symlinks=not args.no_symlinks)
+                symlinks=not args.no_symlinks,
+                casesensitive=not args.insensitive)
         except FormicError as exception:
             parser.print_usage()
             print(exception.message)

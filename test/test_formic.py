@@ -152,7 +152,7 @@ def find_count_dos(directory, pattern):
 def get_test_directory():
     """Return a platform-suitable directory for bulk-testing"""
     if os.name == "posix":
-        return "/usr"
+        return "/usr/local/etc"
     elif os.name == "nt":
         return "C:\\WINDOWS"
     else:
@@ -1049,7 +1049,7 @@ class TestFileSet(object):
         pattern_py = os.path.sep + os.path.join("**", "*.py")
         pattern_pyc = os.path.sep + os.path.join("**", "*.pyc")
         pattern_txt = os.path.sep + os.path.join("**", "*.txt")
-        print("Formic directory=", root, "include=", pattern_all)
+        print("Formic directory=", root, "include=", pattern_py)
         definitive_count = find_count(root, "*.py")
 
         fs = FileSet(directory=root, include=pattern_py, symlinks=False)
@@ -1208,15 +1208,25 @@ class TestMiscellaneous(object):
             assert len(found) == 1
             print("   ... found", test)
 
+        root = os.path.join(os.path.dirname(os.path.dirname(__file__)), "formic")
+        test_names = ["Formic.py", "version.txt", "LICENSE.TXT"]
         if os.name == "posix":
-            for test in ["Formic.py", "VERSION.Txt"]:
-                print("POSIX testing for non-match of", test)
+            for test in test_names:
+                print("POSIX testing for case-sensitive-match of", test)
                 found = [f for f in FileSet(include=test, directory=root)]
                 assert len(found) == 0
+            for test in test_names:
+                print("POSIX testing for case-insensitive-match of", test)
+                found = [f for f in FileSet(include=test, directory=root, casesensitive=False)]
+                assert len(found) == 1
         elif os.name == "nt":
-            for test in ["Formic.py", "VERSION.Txt"]:
-                print("NT testing for match of", test)
+            for test in test_names:
+                print("NT testing for case-sensitive-match of", test)
                 found = [f for f in FileSet(include=test, directory=root)]
+                assert len(found) == 1
+            for test in test_names:
+                print("NT testing for case-insensitive-match of", test)
+                found = [f for f in FileSet(include=test, directory=root, casesensitive=False)]
                 assert len(found) == 1
 
     def test_get_path_components(self):

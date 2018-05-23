@@ -31,8 +31,8 @@ The main entry points for this modules are:
 """
 
 import sys
-from os import path, getcwd, walk
-from fnmatch import fnmatch, filter as fnfilter
+import os
+import fnmatch
 from itertools import chain
 from collections import defaultdict
 
@@ -55,7 +55,7 @@ def get_version():
         return resource_string(__name__, "VERSION.txt").decode('utf8').strip()
     except Exception:
         # If the package manager is not present, try reading the file
-        version = path.join(path.dirname(__file__), "VERSION.txt")
+        version = os.path.join(os.path.dirname(__file__), "VERSION.txt")
         with open(version, "r") as f:
             return f.readlines()[0].strip()
 
@@ -67,12 +67,12 @@ def get_path_components(directory):
     :return: a tuple consisting of the drive (if any) and an ordered list of
              folder names
     """
-    drive, dirs = path.splitdrive(directory)
+    drive, dirs = os.path.splitdrive(directory)
     folders = []
     previous = ""
     while dirs != previous and dirs != "":
         previous = dirs
-        dirs, folder = path.split(dirs)
+        dirs, folder = os.path.split(dirs)
         if folder != "":
             folders.append(folder)
     folders.reverse()
@@ -87,7 +87,7 @@ def reconstitute_path(drive, folders):
     :return: A path comprising the drive and list of folder names. The path terminate
              with a `os.path.sep` *only* if it is a root directory
     """
-    reconstituted = path.join(drive, path.sep, *folders)
+    reconstituted = os.path.join(drive, os.path.sep, *folders)
     return reconstituted
 
 
@@ -104,9 +104,7 @@ def list_to_tree(files):
     """Converts a list of filenames into a directory tree structure."""
 
     def attach(branch, trunk):
-        '''
-        Insert a branch of directories on its trunk.
-        '''
+        """Insert a branch of directories on its trunk."""
         parts = branch.split('/', 1)
         if len(parts) == 1:  # branch is a file
             trunk[FILE_MARKER].append(parts[0])
@@ -130,7 +128,7 @@ def tree_walk(directory, tree):
     files = tree[FILE_MARKER]
     results.append((directory, dirs, files))
     for d in dirs:
-        subdir = path.join(directory, d)
+        subdir = os.path.join(directory, d)
         subtree = tree[d]
         results.extend(tree_walk(subdir, subtree))
     return results
@@ -177,7 +175,7 @@ class Matcher(object):
             return ConstantMatcher(pattern)
 
     def __init__(self, pattern):
-        self.pattern = path.normcase(pattern)
+        self.pattern = os.path.normcase(pattern)
         self.pp = pattern
 
     def match(self, _):
@@ -211,14 +209,11 @@ class FNMatcher(Matcher):
     * ``FNMatcher("?ed")`` matches bed, fed, wed but not failed
 
     :class:`FNMatcher` internally uses :func:`fnmatch.fnmatch()` to implement
-    :meth:`Matcher.match`"""
-
-    def __init__(self, pattern):
-        super(FNMatcher, self).__init__(pattern)
+    :meth:`Matcher.match()`"""
 
     def match(self, string):
         """Returns True if the pattern matches the string"""
-        return fnmatch(string, self.pattern)
+        return fnmatch.fnmatch(string, self.pattern)
 
 
 class ConstantMatcher(Matcher):
@@ -227,12 +222,9 @@ class ConstantMatcher(Matcher):
     This is used to more efficiently match path and file elements that
     do not have a wild-card, eg ``__init__.py``"""
 
-    def __init__(self, pattern):
-        super(ConstantMatcher, self).__init__(pattern)
-
     def match(self, string):
         """Returns True if the argument matches the constant."""
-        return self.pattern == path.normcase(string)
+        return self.pattern == os.path.normcase(string)
 
 
 class Section(object):
@@ -413,16 +405,16 @@ class Pattern(object):
     """
 
     @staticmethod
-    def create(glob):
+    def create(glob, casesensitive=True):
         glob = glob.replace('\\', '/').replace('//', '/')
         elements = Pattern._simplify(glob.split('/'))
         if len(elements) > 1 and elements[-1] == "**":
             ps = PatternSet()
-            ps.append(Pattern(elements))
-            ps.append(Pattern(elements[:-1]))
+            ps.append(Pattern(elements, casesensitive))
+            ps.append(Pattern(elements[:-1], casesensitive))
             return ps
         else:
-            return Pattern(elements)
+            return Pattern(elements, casesensitive)
 
     @staticmethod
     def _simplify(elements):
@@ -443,7 +435,7 @@ class Pattern(object):
                 # Remove repeated "**"s
                 pass
             else:
-                simplified.append(path.normcase(element))
+                simplified.append(os.path.normcase(element))
                 previous = element
 
         if simplified[-1] == "":
@@ -462,7 +454,7 @@ class Pattern(object):
 
         return simplified
 
-    def __init__(self, elements):
+    def __init__(self, elements, casesensitive):
         self.sections = []
         self.str = []
 
@@ -470,7 +462,7 @@ class Pattern(object):
 
         if elements[-1] != "**":
             # Patterns like "constant", "cons*" or "c?nst?nt"
-            self.file_pattern = path.normcase(elements[-1])
+            self.file_pattern = os.path.normcase(elements[-1])
             del elements[-1]
         else:
             self.file_pattern = "*"
@@ -481,11 +473,17 @@ class Pattern(object):
             # The pattern matches everything
             self.file_filter = lambda files: files
         elif "*" in self.file_pattern or "?" in self.file_pattern:
-            # The pattern is a glob. Use fnmatch.filter
-            self.file_filter = lambda files: fnfilter(files, self.file_pattern)
+            # The pattern is a glob. Use `fnmatch.filter()`
+            if casesensitive:
+                self.file_filter = lambda files: fnmatch.filter(files, self.file_pattern)
+            else:
+                self.file_filter = lambda files: [f for f in files if fnmatch.fnmatch(f.lower(), self.file_pattern.lower())]
         else:
             # This is a 'constant' pattern - use comprehension
-            self.file_filter = lambda files: [f for f in files if path.normcase(f) == self.file_pattern]
+            if casesensitive:
+                self.file_filter = lambda files: [f for f in files if os.path.normcase(f) == self.file_pattern]
+            else:
+                self.file_filter = lambda files: [f for f in files if os.path.normcase(f).lower() == self.file_pattern.lower()]
 
         if elements:
             self.bound_end = elements[-1] != "**"
@@ -787,7 +785,7 @@ class FileSetState(object):
     def __init__(self, label, directory, based_on=None, unmatched=None):
         self.label = label
         if directory:
-            self.path_elements = directory.split(path.sep)
+            self.path_elements = directory.split(os.path.sep)
         else:
             self.path_elements = []
 
@@ -934,37 +932,6 @@ def get_initial_default_excludes():
      This will be the initial value of :attr:`FileSet.DEFAULT_EXCLUDES`.
      It is defined in the `Ant documentation
      <http://ant.apache.org/manual/dirtasks.html#defaultexcludes>`_.
-     Formic adds ``**/__pycache__/**``, with the resulting list being:
-
-        * \*\*/pycache/\*\*/\*
-        * \*\*/\*~
-        * \*\*/#\*#
-        * \*\*/.#\*
-        * \*\*/%*%
-        * \*\*/._\*
-        * \*\*/CVS
-        * \*\*/CVS/\*\*/\*
-        * \*\*/.cvsignore
-        * \*\*/SCCS
-        * \*\*/SCCS/\*\*/\*
-        * \*\*/vssver.scc
-        * \*\*/.svn
-        * \*\*/.svn/\*\*/\*
-        * \*\*/.DS_Store
-        * \*\*/.git
-        * \*\*/.git/\*\*/\*
-        * \*\*/.gitattributes
-        * \*\*/.gitignore
-        * \*\*/.gitmodules
-        * \*\*/.hg
-        * \*\*/.hg/\*\*/\*
-        * \*\*/.hgignore
-        * \*\*/.hgsub
-        * \*\*/.hgsubstate
-        * \*\*/.hgtags
-        * \*\*/.bzr
-        * \*\*/.bzr/\*\*/\*
-        * \*\*/.bzrignore
      """
     return [Pattern.create(exclude) for exclude in '''**/__pycache__/**/*
 **/*~
@@ -1020,42 +987,7 @@ class FileSet(object):
     6. *walk*: A function whose argument is a single directory that returns
        a list of (dirname, subdirectoryNames, fileNames) tuples with the same
        semantics of :func:`os.walk()`. Defaults to :func:`os.walk()`
-
-    **Usage**
-
-    First, construct a ``FileSet``::
-
-            from formic import FileSet
-            fileset = FileSet(directory="/some/where/interesting",
-                              include="*.py",
-                              exclude=["**/*test*/**", "test*"]
-                              )
-
-    There are three APIs for retrieving matches:
-
-    1. FileSet is itself an iterator and returns absolute file names::
-
-            for filename in fileset:
-                print filename
-
-    2. For more control, use ``fileset.qualified_files()``. The following
-       prints filenames *relative* to the directory::
-
-            for filename in fileset.qualified_files(absolute=False):
-                print filename
-
-    3. For absolute control, use the ``fileset.files()`` method and handle the
-       returned tuple yourself::
-
-            prefix = fileset.get_directory()
-            for directory, file_name in fileset.files():
-                sys.stdout.write(prefix)
-                if directory:
-                    sys.stdout.write(path.sep)
-                    sys.stdout.write(directory)
-                sys.stdout.write(path.sep)
-                sys.stdout.write(file_name)
-                sys.stdout.write("\\n")
+    7. *casesensitive*: Only effective on POSIX, default True. Always False on NT.
 
     Implementation notes:
 
@@ -1100,7 +1032,6 @@ class FileSet(object):
        This lists 1/2/3.py and 1/2/4.py no matter what the contents of the
        current directory are. CVS/error.py is not listed because of the default
        excludes.
-
     """
     #: Default excludes shared by all instances. The member is a list of
     #: :class:`Pattern` instances. You may modify this member at run time to
@@ -1112,26 +1043,31 @@ class FileSet(object):
                  exclude=None,
                  directory=None,
                  default_excludes=True,
-                 walk=walk,
-                 symlinks=True):
+                 walk=None,
+                 symlinks=True,
+                 casesensitive=True):
 
-        self.include = FileSet._preprocess(include)
+        # always case-insensitivity on NT, but sensitive/insensitive on POSIX
+        casesensitive = casesensitive if os.name == 'posix' else False
+
+        self.include = FileSet._preprocess(include, casesensitive)
         if not self.include:
             raise FormicError("No include globs have been specified"
                               "- nothing to find")
-        self.exclude = FileSet._preprocess(exclude)
+
+        self.exclude = FileSet._preprocess(exclude, casesensitive)
         self.symlinks = symlinks
-        self.walk_func = walk
+        self.walk_func = walk if walk else os.walk
         if default_excludes:
             self.exclude.extend(FileSet.DEFAULT_EXCLUDES)
         if directory is None:
             self.directory = None
         else:
-            self.directory = path.abspath(directory)
+            self.directory = os.path.abspath(directory)
         self._received = 0  # Used for testing
 
     @staticmethod
-    def _preprocess(argument):
+    def _preprocess(argument, casesensitive):
         """Receives the argument (from the constructor), and normalizes it
         into a list of Pattern objects."""
         pattern_set = PatternSet()
@@ -1141,7 +1077,7 @@ class FileSet(object):
 
             for glob in argument:
                 if isinstance(glob, str):
-                    patterns = Pattern.create(glob)
+                    patterns = Pattern.create(glob, casesensitive)
                     pattern_set.extend(patterns)
 
                 elif isinstance(glob, Pattern):
@@ -1157,7 +1093,7 @@ class FileSet(object):
 
         The returned result is normalized so it never contains a trailing
         path separator"""
-        directory = self.directory if self.directory else getcwd()
+        directory = self.directory if self.directory else os.getcwd()
         drive, folders = get_path_components(directory)
         return reconstitute_path(drive, folders)
 
@@ -1167,10 +1103,10 @@ class FileSet(object):
         self._received += 1
 
         if not self.symlinks:
-            where = root + path.sep + directory + path.sep
+            where = root + os.path.sep + directory + os.path.sep
             files = [
                 file_name for file_name in files
-                if not path.islink(where + file_name)
+                if not os.path.islink(where + file_name)
             ]
 
         include = FileSetState("Include", directory, include, None
@@ -1221,7 +1157,7 @@ class FileSet(object):
         are returned, otherwise files are fully qualified."""
         prefix = self.get_directory() if absolute else "."
         for rel_dir_name, file_name in self.files():
-            yield path.join(prefix, rel_dir_name, file_name)
+            yield os.path.join(prefix, rel_dir_name, file_name)
 
     def __iter__(self):
         """A natural iteration of files in the set.
@@ -1253,7 +1189,7 @@ class FileSet(object):
 
     def __str__(self):
         return "FileSet [directory={0}, include={1}, exclude={2}, symlinks? {3}]".\
-                format(self.directory if self.directory else "CWD ({0})".format(getcwd()),
+                format(self.directory if self.directory else "CWD ({0})".format(os.getcwd()),
                        self.include.patterns,
                        self.exclude.patterns,
                        self.symlinks)
