@@ -7,7 +7,45 @@ History
 Formic is forked from https://bitbucket.org/aviser/formic. The original project only supports python2.7 and has not been maintained for a long time.
 
 I added Python3 supports and fixed some issues.
+Formic now can work on any Python 2.6+ or Python 3.4+ system. If not, please `file an issue <https://github.com/wolfhong/formic/issues/new>`_. Yet not tested on other Python version.
+
 Formic has no runtime dependencies outside the Python system libraries.
+
+Quickstart
+----------
+
+Formic can be installed from the Cheeseshop with easy_install::
+
+   $ easy_install formic2
+
+Or pip::
+
+   $ pip install formic2
+
+Once installed, you can use Formic either from the command line to find from the current directory::
+
+   $ formic -i "*.py" -e "__init__.py" "**/*test*/" "test_*"
+
+This will search for files all Python files under the current directory
+excluding all `__init__.py` files, any file in directories whose name contains
+the word 'test', and any files that start `test_`.
+
+You can also find from the specified directory like below::
+
+   $ formic /specified/directory/can/ignore/ -i "*.py" "**/test/**/*.txt" "*.ini"
+
+Or integrated right into your Python project::
+
+    import formic
+    fileset = formic.FileSet(include="**.py",
+                             exclude=["**/*test*/**", "test_*"]
+                             )
+
+    for file_name in fileset:
+        # Do something with file_name
+        ...
+
+That's about it :)
 
 Features
 --------
@@ -50,38 +88,6 @@ Python has built-in support for simple globs in `fnmatcher
 
 * Is more efficient with many common patterns; it runs relatively faster on large directory trees with large numbers of files.
 
-Quickstart
-----------
-
-Formic can be installed from the Cheeseshop with easy_install::
-
-   $ easy_install formic2
-
-or pip::
-
-   $ pip install formic2
-
-Once installed, you can use Formic either from the command line::
-
-   $ formic -i "*.py" -e "__init__.py" "**/*test*/" "test_*"
-
-This will search for files all Python files under the current directory
-excluding all `__init__.py` files, any file in directories whose name contains
-the word 'test', and any files that start `test_`.
-
-Or integrated right into your Python project::
-
-    import formic
-    fileset = formic.FileSet(include="**.py",
-                             exclude=["**/*test*/**", "test_*"]
-                             )
-
-    for file_name in fileset:
-        # Do something with file_name
-        ...
-
-That's about it :)
-
 About
 -----
 
@@ -89,10 +95,9 @@ Formic is originally written and maintained by `Andrew Alcock <mailto:formic@avi
 
 But now, I forked it on GitHub and will maintain this project voluntarily for a long time.
 
-* `Origin homepage <http://www.aviser.asia/formic>`_
-* `Issue tracker <https://github.com/wolfhong/formic/issues?status=new&status=open>`_
-* `Source <https://github.com/wolfhong/formic>`_ on GitHub
-* `Email maintainer <mailto:formic@aviser.asia>`_
+* `Origin Homepage <http://www.aviser.asia/formic>`_
+* `Current Issue tracker <https://github.com/wolfhong/formic/issues?status=new&status=open>`_
+* `Current Source <https://github.com/wolfhong/formic>`_ on GitHub
 
 Formic is Copyright (C) 2012, Aviser LLP and released under
-`GPLv3 <http://www.gnu.org/licenses/gpl.html>`_. Aviser LLP would be happy to discuss other licensing arrangements; for details, please email the maintainer.
+`GPLv3 <http://www.gnu.org/licenses/gpl.html>`_. Aviser LLP would be happy to discuss other licensing arrangements; for details, please email the Aviser LLP maintainer.

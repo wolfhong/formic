@@ -18,8 +18,14 @@
 """Tests on formic"""
 # pylint: disable-all
 
+import sys
 import os
 import pytest
+
+add_path = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+sys.path.insert(0, add_path)
+
+
 from formic.formic import get_version, MatchType, Matcher, ConstantMatcher, \
     FNMatcher, FormicError, Section, Pattern, PatternSet, FileSetState, \
     FileSet, get_path_components, reconstitute_path, walk_from_list
@@ -985,24 +991,24 @@ class TestFileSetState(object):
         file_set_state_location(a, pattern2, UNMATCHED)
         file_set_state_location(a, pattern3, UNMATCHED)
         assert not a.match([])
-        assert {"a.a"} == a.match(all_files)
-        assert {"a.a", "aa.a"} == a.match(a_files)
+        assert set(["a.a"]) == a.match(all_files)
+        assert set(["a.a", "aa.a"]) == a.match(a_files)
 
         b = FileSetState("Label", os.path.join("a", "b"), a)
         file_set_state_location(b, pattern1, NOT_PRESENT)  # In parent
         file_set_state_location(b, pattern2, MATCHED_INHERIT)
         file_set_state_location(b, pattern3, UNMATCHED)
         assert not b.match([])
-        assert {"a.a", "b.b"} == b.match(all_files)
-        assert {"a.a", "aa.a"} == b.match(a_files)
+        assert set(["a.a", "b.b"]) == b.match(all_files)
+        assert set(["a.a", "aa.a"]) == b.match(a_files)
 
         c = FileSetState("Label", os.path.join("a", "b", "c"), b)
         file_set_state_location(c, pattern1, NOT_PRESENT)  # In grandparent
         file_set_state_location(c, pattern2, NOT_PRESENT)  # In parent
         file_set_state_location(c, pattern3, MATCHED_NO_SUBDIR)
         assert not c.match([])
-        assert {"a.a", "b.b", "c.c"} == c.match(all_files)
-        assert {"a.a", "aa.a"} == c.match(a_files)
+        assert set(["a.a", "b.b", "c.c"]) == c.match(all_files)
+        assert set(["a.a", "aa.a"]) == c.match(a_files)
 
         d = FileSetState("Label", os.path.join("a", "b", "c", "d"), b)
         file_set_state_location(d, pattern1,
@@ -1010,8 +1016,8 @@ class TestFileSetState(object):
         file_set_state_location(d, pattern2, NOT_PRESENT)  # In grandparent
         file_set_state_location(d, pattern3, NOT_PRESENT)  # Not applicable
         assert not d.match([])
-        assert {"a.a", "b.b"} == d.match(all_files)
-        assert {"a.a", "aa.a"} == b.match(a_files)
+        assert set(["a.a", "b.b"]) == d.match(all_files)
+        assert set(["a.a", "aa.a"]) == b.match(a_files)
 
     def test_patterns_inherit_all_files(self):
         pattern1 = Pattern.create("/a/**/*")
@@ -1102,7 +1108,7 @@ class TestFileSet(object):
     def test_iterator(self):
         fs = FileSet(include="*.py")
         i = fs.__iter__()
-        assert {f for f in fs.qualified_files()} == {f for f in i}
+        assert set([f for f in fs.qualified_files()]) == set([f for f in i])
 
     def test_alternate_walk(self):
         files = [

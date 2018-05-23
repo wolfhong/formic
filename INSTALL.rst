@@ -6,14 +6,14 @@ Prequisites
 
 Platform and dependencies:
 
-* Formic requires Python 2.7+ or Python3.4+
+* Formic requires Python 2.6+ or Python3.4+
 * It has been tested on
 
   * Mac OS X (Lion and Mountain Lion)
   * Ubuntu 11.10 and 12.04LTS
   * Windows XP, Windows 7 (Home Premium) and Windows 10.
 
-Formic can work on any Python 2.7 or Python 3.4+ system; if not, please contact the
+Formic can work on any Python 2.6+ or Python 3.4+ system; if not, please contact the
 maintainer or `file an issue
 <https://github.com/wolfhong/formic/issues/new>`_.
 
@@ -38,7 +38,7 @@ or::
 **Option 2: Source install**
 
 1. Download the appropriate package from Formics page on the `Python
-   Package Index <http://pypi.python.org/pypi/formic>`_. This is a GZipped TAR
+   Package Index <http://pypi.python.org/pypi/formic2>`_. This is a GZipped TAR
    file.
 2. Extract the package using your preferred GZip utility.
 3. Navigate into the extracted directory and perform the installation::
@@ -48,14 +48,7 @@ or::
 **Option 3: Check out the project**
 
 If you like, you could download the source and compile it yourself. The
-source is on a Mercurial DVCS at `Atlassian BitBucket
-<https://bitbucket.org/aviser/formic.>`_. BitBucket provides several different
-approaches for download on the site, the simplest being::
-
-    $ hg clone https://bitbucket.org/aviser/formic
-
-.. note:: To build, Formic requires setuptools. We strongly recommend building
-          in a virtual environment using virtualenv.
+source is now on `GitHub <https://github.com/wolfhong/formic>`_. 
 
 After checking out the source, navigate to the top level directory and build::
 
@@ -67,23 +60,11 @@ Validating the installation
 After installing, you should be able to execute Formic from the command line::
 
     $ formic --version
-    formic xxxx http://www.aviser.asia/formic
 
-(xxxx will be the version of Formic that you downloaded and installed)
-
-If you downloaded the source, you can additionally run the unit tests. This
-requires py.test::
+If you downloaded the source, you can additionally run the unit tests. This requires py.test::
 
     $ easy_install pytest
-    $ cd formic
-    $ py.test
-    ========================== test session starts ==========================
-    platform darwin -- Python 2.7.1 -- pytest-2.2.3
-    collected 40 items
-
-    test_formic.py ........................................
-
-    ======================= 40 passed in 2.55 seconds =======================
+    $ pytest -v test
 
 Compiling the documentation
 ---------------------------

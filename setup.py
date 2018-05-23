@@ -36,13 +36,14 @@ setup(
     classifiers=[
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 2.6+",
+        "Programming Language :: Python :: 3.4+",
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "Topic :: Software Development :: Libraries",
     ],
     keywords=[
-        'Apache Ant', 'glob', 'recurse', 'FileSet', 'file utilities', 'find'
+        'Apache Ant', 'glob', 'recurse', 'FileSet', 'file utilities', 'find', 'fnmatcher'
     ],
     license='GPLv3+',
     packages=["formic"],
