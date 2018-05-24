@@ -150,6 +150,11 @@ def walk_from_list(files):
     return walk
 
 
+def determine_casesensitive(casesensitive):
+    """Can be True/False on POSIX, but always False on NT."""
+    return casesensitive if os.name == 'posix' else False
+
+
 class FormicError(Exception):
     """Formic errors, such as misconfigured arguments and internal exceptions"""
 
@@ -166,17 +171,20 @@ class Matcher(object):
     various subclasses."""
 
     @staticmethod
-    def create(pattern):
+    def create(pattern, casesensitive=True):
         """Factory for :class:`Matcher` instances; returns a :class:`Matcher`
         suitable for matching the supplied pattern"""
+        casesensitive = determine_casesensitive(casesensitive)
         if "?" in pattern or "*" in pattern:
-            return FNMatcher(pattern)
+            return FNMatcher(pattern, casesensitive)
         else:
-            return ConstantMatcher(pattern)
+            return ConstantMatcher(pattern, casesensitive)
 
-    def __init__(self, pattern):
+    def __init__(self, pattern, casesensitive=True):
+        casesensitive = determine_casesensitive(casesensitive)
         self.pattern = os.path.normcase(pattern)
         self.pp = pattern
+        self.casesensitive = casesensitive
 
     def match(self, _):
         """:class:`Matcher` is an abstract class - this will raise a
@@ -213,7 +221,10 @@ class FNMatcher(Matcher):
 
     def match(self, string):
         """Returns True if the pattern matches the string"""
-        return fnmatch.fnmatch(string, self.pattern)
+        if self.casesensitive:
+            return fnmatch.fnmatch(string, self.pattern)
+        else:
+            return fnmatch.fnmatch(string.lower(), self.pattern.lower())
 
 
 class ConstantMatcher(Matcher):
@@ -224,7 +235,10 @@ class ConstantMatcher(Matcher):
 
     def match(self, string):
         """Returns True if the argument matches the constant."""
-        return self.pattern == os.path.normcase(string)
+        if self.casesensitive:
+            return self.pattern == os.path.normcase(string)
+        else:
+            return self.pattern.lower() == os.path.normcase(string).lower()
 
 
 class Section(object):
@@ -242,13 +256,14 @@ class Section(object):
     3. ``Section(["end"])``
     """
 
-    def __init__(self, elements):
+    def __init__(self, elements, casesensitive=True):
+        casesensitive = determine_casesensitive(casesensitive)
         assert elements
         self.elements = []
         self.bound_start = False
         self.bound_end = False
         for element in elements:
-            self.elements.append(Matcher.create(element))
+            self.elements.append(Matcher.create(element, casesensitive))
         self.length = len(self.elements)
         self.str = "/".join(str(e) for e in self.elements)
 
@@ -406,6 +421,7 @@ class Pattern(object):
 
     @staticmethod
     def create(glob, casesensitive=True):
+        casesensitive = determine_casesensitive(casesensitive)
         glob = glob.replace('\\', '/').replace('//', '/')
         elements = Pattern._simplify(glob.split('/'))
         if len(elements) > 1 and elements[-1] == "**":
@@ -494,12 +510,12 @@ class Pattern(object):
         for element in elements:
             if element == '**':
                 if fragment:
-                    self.sections.append(Section(fragment))
+                    self.sections.append(Section(fragment, casesensitive))
                 fragment = []
             else:
                 fragment.append(element)
         if fragment:
-            self.sections.append(Section(fragment))
+            self.sections.append(Section(fragment, casesensitive))
 
         # Propagate the bound start/end to the sections
         if self.bound_start and self.sections:
@@ -1048,7 +1064,7 @@ class FileSet(object):
                  casesensitive=True):
 
         # always case-insensitivity on NT, but sensitive/insensitive on POSIX
-        casesensitive = casesensitive if os.name == 'posix' else False
+        casesensitive = determine_casesensitive(casesensitive)
 
         self.include = FileSet._preprocess(include, casesensitive)
         if not self.include:

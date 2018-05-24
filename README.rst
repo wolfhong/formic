@@ -11,8 +11,8 @@ Formic now can work on any Python 2.6+ or Python 3.4+ system. If not, please `fi
 
 Formic has no runtime dependencies outside the Python system libraries.
 
-Quickstart
-----------
+Install
+--------
 
 Formic can be installed from the Cheeseshop with easy_install::
 
@@ -21,6 +21,9 @@ Formic can be installed from the Cheeseshop with easy_install::
 Or pip::
 
    $ pip install formic2
+
+Quickstart
+----------
 
 Once installed, you can use Formic either from the command line to find from the current directory::
 
@@ -52,16 +55,27 @@ Formic can also be integrated right into your Python project::
         # Do something with file_name
         ...
 
-Formic is case-insensitive on NT, but case-sensitive on POSIX.
+Formic is always case-insensitive on NT, but can be either case-sensitive or case-insensitive on POSIX.
 
 On NT::
 
-    $ formic ./test/ -i "upper*" "upper*/"
+    $ formic ./test/ -i "upp*" "upp*/"
     /some/where/formic/test/lower/UPPER.txt
     /some/where/formic/test/UPPER/lower.txt
     /some/where/formic/test/UPPER/UPPER.txt
 
-On POSIX, nothing will be printed.
+On POSIX with case-insensitive::
+
+    $ formic ./test/ --insensitive -i "upp*" "upp*/"
+    /some/where/formic/test/lower/UPPER.txt
+    /some/where/formic/test/UPPER/lower.txt
+    /some/where/formic/test/UPPER/UPPER.txt
+
+with case-sensitive::
+
+    $ formic ./test/ -i "upp*" "upp*/"
+    $
+
 
 That's about it :)
 

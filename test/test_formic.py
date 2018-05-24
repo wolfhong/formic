@@ -154,7 +154,7 @@ def get_test_directory():
     if os.name == "posix":
         return "/usr/local/etc"
     elif os.name == "nt":
-        return "C:\\WINDOWS"
+        return "C:\\WINDOWS\\Boot"
     else:
         raise Exception("System is neither Posix not Windows")
 
@@ -1103,7 +1103,7 @@ class TestFileSet(object):
 
     def test_vs_find(self):
         compare_find_and_formic(get_test_directory())
-        compare_find_and_formic(get_test_directory(), "a*")
+        compare_find_and_formic(get_test_directory(), "c*")
 
     def test_iterator(self):
         fs = FileSet(include="*.py")
@@ -1150,7 +1150,7 @@ class TestFileSet(object):
 
 class TestMiscellaneous(object):
     def test_version(self):
-        assert "1.0.1" == get_version()
+        assert "1.0.2" == get_version()
 
     def test_rooted(self):
         curdir = os.getcwd()
@@ -1208,6 +1208,27 @@ class TestMiscellaneous(object):
             assert len(found) == 1
             print("   ... found", test)
 
+        root = os.path.join(os.path.dirname(os.path.dirname(__file__)), "test/lower")
+        test_names = ["LOWER.TXT", "upper.txt"]
+        if os.name == "posix":
+            for test in test_names:
+                print("POSIX testing case-sensitive-exclude of", test)
+                found = [f for f in FileSet("*", exclude=test, directory=root)]
+                assert len(found) == 2
+            for test in test_names:
+                print("POSIX testing case-insensitive-exclude of", test)
+                found = [f for f in FileSet("*", exclude=test, directory=root, casesensitive=False)]
+                assert len(found) == 1
+        elif os.name == 'nt':
+            for test in test_names:
+                print("NT testing case-sensitive-exclude of", test)
+                found = [f for f in FileSet("*", exclude=test, directory=root)]
+                assert len(found) == 1
+            for test in test_names:
+                print("Nt testing case-insensitive-exclude of", test)
+                found = [f for f in FileSet("*", exclude=test, directory=root, casesensitive=False)]
+                assert len(found) == 1
+
         root = os.path.join(os.path.dirname(os.path.dirname(__file__)), "formic")
         test_names = ["Formic.py", "version.txt", "LICENSE.TXT"]
         if os.name == "posix":
@@ -1228,6 +1249,41 @@ class TestMiscellaneous(object):
                 print("NT testing for case-insensitive-match of", test)
                 found = [f for f in FileSet(include=test, directory=root, casesensitive=False)]
                 assert len(found) == 1
+
+    def test_directory_case(self):
+        root = os.path.join(os.path.dirname(os.path.dirname(__file__)), "test")
+        sensitive_names = ["/lower/", "/UPP*/"]
+        insensitive_names = ["/LOWER/", "/upp*/"]
+        if os.name == "posix":
+            # FileSet is sensitive
+            for test in sensitive_names:
+                found = [f for f in FileSet(include=test, directory=root)]
+                assert len(found) == 2
+            for test in insensitive_names:
+                found = [f for f in FileSet(include=test, directory=root)]
+                assert len(found) == 0
+            # FileSet is insensitive
+            for test in sensitive_names:
+                found = [f for f in FileSet(include=test, directory=root, casesensitive=False)]
+                assert len(found) == 2
+            for test in insensitive_names:
+                found = [f for f in FileSet(include=test, directory=root, casesensitive=False)]
+                assert len(found) == 2
+        elif os.name == "nt":
+            # FileSet is sensitive
+            for test in sensitive_names:
+                found = [f for f in FileSet(include=test, directory=root)]
+                assert len(found) == 2
+            for test in insensitive_names:
+                found = [f for f in FileSet(include=test, directory=root)]
+                assert len(found) == 2
+            # FileSet is insensitive
+            for test in sensitive_names:
+                found = [f for f in FileSet(include=test, directory=root, casesensitive=False)]
+                assert len(found) == 2
+            for test in insensitive_names:
+                found = [f for f in FileSet(include=test, directory=root, casesensitive=False)]
+                assert len(found) == 2
 
     def test_get_path_components(self):
         drive, components = get_path_components(os.path.join("a", "b", "c"))

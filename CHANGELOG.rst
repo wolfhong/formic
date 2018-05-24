@@ -1,8 +1,16 @@
 Changelog
 =========
 
-1.0
-----
+1.0.2
+------
+
+New feature:
+
+* Fix #2, FileSet now can contain arg casesensitive=True|False, default True on POSIX, but always False on NT.
+* Fix #2, casesensitive can apply on both file-name and directory-name.
+
+1.0.1
+------
 
 New feature:
 
