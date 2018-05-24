@@ -152,7 +152,7 @@ def find_count_dos(directory, pattern):
 def get_test_directory():
     """Return a platform-suitable directory for bulk-testing"""
     if os.name == "posix":
-        return "/usr/local/etc"
+        return "/etc"
     elif os.name == "nt":
         return "C:\\WINDOWS\\Boot"
     else:
