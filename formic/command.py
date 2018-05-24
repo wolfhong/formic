@@ -40,7 +40,7 @@ DESCRIPTION = """Search the file system using Apache Ant globs"""
 
 EPILOG = \
 """For documentation, source code and other information, please visit:
-http://www.aviser.asia/formic
+https://github.com/wolfhong/formic
 
 This program comes with ABSOLUTELY NO WARRANTY. See license for details.
 
@@ -206,7 +206,7 @@ Ant FileSet (and Formic) has built-in patterns to screen out a lot of
 development 'noise', such as hidden VCS files and directories. The full list is
 at:
 
-    * http://www.aviser.asia/formic/api.html#formic.formic.get_initial_default_excludes
+    * https://formic.readthedocs.io/en/latest/api.html#formic.formic.get_initial_default_excludes
 
 Default excludes can be simply switched off on both the command line and the
 API, for example::

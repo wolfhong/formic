@@ -11,16 +11,18 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os, formic
+import sys
+import os
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('.'))
-location = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "formic"))
+# sys.path.insert(0, os.path.abspath('.'))
+location = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 assert os.path.isdir(location)
 sys.path.insert(0, location)
+
+import formic
 
 # -- General configuration -----------------------------------------------------
 
@@ -45,7 +47,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Formic'
-copyright = '2012, Aviser LLP, Singapore'
+copyright = ''
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -60,7 +62,6 @@ matches = re.search("^([0-9.]+).*$", release)
 version = matches.group(1)
 print("-" * 80)
 print("Project:", project)
-print("Build location:", location)
 print("Read version (release):", version, "(" + release + ")")
 print("-" * 80)
 
@@ -193,8 +194,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-    ('index', 'Formic.tex', 'Formic Documentation', 'Aviser LLP, Singapore',
-     'manual'),
+    ('index', 'Formic.tex', 'Formic Documentation', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -233,7 +233,7 @@ man_pages = [('index', 'formic', 'Formic Documentation',
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    ('index', 'Formic', 'Formic Documentation', 'Aviser LLP, Singapore',
+    ('index', 'Formic', 'Formic Documentation',
      'Formic', 'One line description of project.', 'Miscellaneous'),
 ]
 

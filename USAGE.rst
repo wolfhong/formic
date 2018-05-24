@@ -35,7 +35,7 @@ be combined with other executables, eg::
 VCS directories such as ``.svn`` and ``.hg``).
 
 Full usage is documented in the `formic.command
-<http://www.aviser.asia/formic/doc/api.html#module-formic.command>`_ package.
+<https://formic.readthedocs.io/en/latest/api.html#module-formic.command>`_ package.
 
 Library
 -------
@@ -58,4 +58,4 @@ starts with 'test\_'::
         # Do something with file_name
         ...
 
-A more detailed description can be found in the `API <http://www.aviser.asia/formic/doc/api.html>`_.
+A more detailed description can be found in the `API <https://formic.readthedocs.io/en/latest/api.html>`_.

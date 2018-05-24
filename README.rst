@@ -130,6 +130,3 @@ But now, I forked it on GitHub and will maintain this project voluntarily for a 
 * `Origin Homepage <http://www.aviser.asia/formic>`_
 * `Current Issue tracker <https://github.com/wolfhong/formic/issues?status=new&status=open>`_
 * `Current Source <https://github.com/wolfhong/formic>`_ on GitHub
-
-Formic is Copyright (C) 2012, Aviser LLP and released under
-`GPLv3 <http://www.gnu.org/licenses/gpl.html>`_. Aviser LLP would be happy to discuss other licensing arrangements; for details, please email the Aviser LLP maintainer.

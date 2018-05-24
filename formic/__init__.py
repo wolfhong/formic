@@ -25,4 +25,4 @@ An implementation of Apache Ant globs.
 
 from .formic import FileSet, Pattern, get_version, FormicError
 
-__all__ = [FileSet, Pattern, get_version, FormicError]
+__all__ = ['FileSet', 'Pattern', 'get_version', 'FormicError']
