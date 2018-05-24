@@ -28,7 +28,8 @@ sys.path.insert(0, add_path)
 
 from formic.formic import get_version, MatchType, Matcher, ConstantMatcher, \
     FNMatcher, FormicError, Section, Pattern, PatternSet, FileSetState, \
-    FileSet, get_path_components, reconstitute_path, walk_from_list
+    FileSet, get_path_components, reconstitute_path
+from formic.treewalk import TreeWalk
 
 
 def create_starstar(glob):
@@ -152,7 +153,7 @@ def find_count_dos(directory, pattern):
 def get_test_directory():
     """Return a platform-suitable directory for bulk-testing"""
     if os.name == "posix":
-        return "/etc"
+        return "/usr/sbin"
     elif os.name == "nt":
         return "C:\\WINDOWS\\Boot"
     else:
@@ -1116,7 +1117,7 @@ class TestFileSet(object):
             "1/2/4.py", "silly/silly3.txt"
         ]
 
-        fileset = FileSet(include="*.py", walk=walk_from_list(files))
+        fileset = FileSet(include="*.py", walk=TreeWalk.walk_from_list(files))
         found = [(_dir, _file) for _dir, _file in fileset.files()]
 
         assert len(found) == 2
@@ -1130,7 +1131,7 @@ class TestFileSet(object):
             "out/a/test.py"
         ]
 
-        fileset = FileSet(include="in/**/test/", walk=walk_from_list(files))
+        fileset = FileSet(include="in/**/test/", walk=TreeWalk.walk_from_list(files))
         found = [(_dir, _file) for _dir, _file in fileset.files()]
         assert len(found) == 3
         assert (os.path.join("in", "a", "b"), "test") in found
@@ -1141,7 +1142,7 @@ class TestFileSet(object):
             "out/a/3.py", "out/a/test.py"
         ]
 
-        fileset = FileSet(include="in/**/*test*/", walk=walk_from_list(files))
+        fileset = FileSet(include="in/**/*test*/", walk=TreeWalk.walk_from_list(files))
         found = [(_dir, _file) for _dir, _file in fileset.files()]
         assert len(found) == 3
         assert (os.path.join("in", "a", "b"), "4test4") in found
@@ -1284,6 +1285,18 @@ class TestMiscellaneous(object):
             for test in insensitive_names:
                 found = [f for f in FileSet(include=test, directory=root, casesensitive=False)]
                 assert len(found) == 2
+
+    def test_symlinks(self):
+        root = os.path.join(os.path.dirname(os.path.dirname(__file__)), "test/symlinks")
+        pattern = "*.txt"
+        found = [f for f in FileSet(include=pattern, directory=root)]  # symlinks defaults to True
+        assert len(found) == 3
+
+        found = [f for f in FileSet(include=pattern, directory=root, symlinks=True)]
+        assert len(found) == 3
+
+        found = [f for f in FileSet(include=pattern, directory=root, symlinks=False)]
+        assert len(found) == 1
 
     def test_get_path_components(self):
         drive, components = get_path_components(os.path.join("a", "b", "c"))

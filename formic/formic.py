@@ -34,7 +34,6 @@ import sys
 import os
 import fnmatch
 from itertools import chain
-from collections import defaultdict
 
 PY3 = sys.version_info[0] == 3
 
@@ -95,59 +94,6 @@ def is_root(directory):
     """Returns true if the directory is root (eg / on UNIX or c:\\ on Windows)"""
     _, folders = get_path_components(directory)
     return len(folders) == 0
-
-
-FILE_MARKER = object()
-
-
-def list_to_tree(files):
-    """Converts a list of filenames into a directory tree structure."""
-
-    def attach(branch, trunk):
-        """Insert a branch of directories on its trunk."""
-        parts = branch.split('/', 1)
-        if len(parts) == 1:  # branch is a file
-            trunk[FILE_MARKER].append(parts[0])
-        else:
-            node, others = parts
-            if node not in trunk:
-                trunk[node] = defaultdict(dict, ((FILE_MARKER, []), ))
-            attach(others, trunk[node])
-
-    tree = defaultdict(dict, ((FILE_MARKER, []), ))
-    for line in files:
-        attach(line, tree)
-    return tree
-
-
-def tree_walk(directory, tree):
-    """Walks a tree returned by list_to_tree returning a list of
-    3-tuples as if from os.walk()."""
-    results = []
-    dirs = [d for d in tree if d != FILE_MARKER]
-    files = tree[FILE_MARKER]
-    results.append((directory, dirs, files))
-    for d in dirs:
-        subdir = os.path.join(directory, d)
-        subtree = tree[d]
-        results.extend(tree_walk(subdir, subtree))
-    return results
-
-
-def walk_from_list(files):
-    """A function that mimics :func:`os.walk()` by simulating a directory with
-    the list of files passed as an argument.
-
-    :param files: A list of file paths
-    :return: A function that mimics :func:`os.walk()` walking a directory
-             containing only the files listed in the argument
-    """
-    tree = list_to_tree(files)
-
-    def walk(directory):
-        return tree_walk(directory, tree)
-
-    return walk
 
 
 def determine_casesensitive(casesensitive):
@@ -767,7 +713,7 @@ class FileSetState(object):
     2. *directory*: The point in the graph that this FileSetState represents.
        *directory* is relative to the starting node of the graph
     3. *based_on*: A FileSetState from the previous directory traversed by
-       FileSet.walk(). This is used as the start point in the graph of
+       `walk_func()`. This is used as the start point in the graph of
        FileSetStates to search for the correct parent of this. This is None
        to create the root node.
     4. *unmatched*: Used only when *based_on* is None  - the set of initial
@@ -999,7 +945,7 @@ class FileSet(object):
     4. *default_excludes*: A boolean; if True (or omitted) the
        :attr:`DEFAULT_EXCLUDES` will be combined with the *exclude*.
        If False, the only excludes used are those in the excludes argument
-    5. *symlinks*: Sets whether symbolic links are included in the results or not.
+    5. *symlinks*: Sets whether symbolic links are included in the results or not. Defaults to True.
     6. *walk*: A function whose argument is a single directory that returns
        a list of (dirname, subdirectoryNames, fileNames) tuples with the same
        semantics of :func:`os.walk()`. Defaults to :func:`os.walk()`
@@ -1037,11 +983,10 @@ class FileSet(object):
       returns files and directories that don't even exist on the file system.
       This can be useful for testing or even for passing the results of one
       FileSet result as the search path of a second. See
-      :func:`formic.walk_from_list()`::
-
+      :func:`formic.treewalk.walk_from_list()`::
 
           files = ["CVS/error.py", "silly/silly1.txt", "1/2/3.py", "silly/silly3.txt", "1/2/4.py", "silly/silly3.txt"]
-          fileset = FileSet(include="*.py", walk=walk_from_list(files))
+          fileset = FileSet(include="*.py", walk=treewalk.walk_from_list(files))
           for dir, file in fileset:
               print dir, file
 
@@ -1157,7 +1102,7 @@ class FileSet(object):
 
         include = None
         exclude = None
-        for root, dirs, files in self.walk_func(directory):
+        for root, dirs, files in self.walk_func(directory, followlinks=self.symlinks):
             # Remove the constant part of the path inluding the first path sep
             rel_dir_name = root[prefix:]
             matched, include, exclude = self._receive(
