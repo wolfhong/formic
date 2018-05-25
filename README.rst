@@ -1,12 +1,12 @@
 Formic: Apache Ant FileSet and Globs in Python
 ==============================================
 
-.. |v| image::
+.. image::
   https://img.shields.io/pypi/v/formic2.svg
   :target: https://pypi.python.org/pypi/formic2
   :alt: Last stable version (PyPI)
 
-.. [doc] image::
+.. image::
   https://readthedocs.org/projects/formic/badge/?version=latest
   :target: https://formic.readthedocs.io/
   :alt: ReadTheDocs
