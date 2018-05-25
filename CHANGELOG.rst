@@ -1,6 +1,14 @@
 Changelog
 =========
 
+1.0.3
+------
+
+New feature:
+
+* Fix #4, symlinks options now can work.
+* Support `ReadTheDocs <https://formic.readthedocs.io/>`_ .
+
 1.0.2
 ------
 

@@ -1,6 +1,16 @@
 Formic: Apache Ant FileSet and Globs in Python
 ==============================================
 
+.. |v| image::
+  https://img.shields.io/pypi/v/formic2.svg
+  :target: https://pypi.python.org/pypi/formic2
+  :alt: Last stable version (PyPI)
+
+.. [doc] image::
+  https://readthedocs.org/projects/formic/badge/?version=latest
+  :target: https://formic.readthedocs.io/
+  :alt: ReadTheDocs
+
 History
 -------
 
@@ -130,3 +140,5 @@ But now, I forked it on GitHub and will maintain this project voluntarily for a 
 * `Origin Homepage <http://www.aviser.asia/formic>`_
 * `Current Issue tracker <https://github.com/wolfhong/formic/issues?status=new&status=open>`_
 * `Current Source <https://github.com/wolfhong/formic>`_ on GitHub
+* `PyPI <https://pypi.python.org/pypi/formic2>`_
+* `ReadTheDocs <https://formic.readthedocs.io/>`_
