@@ -1151,7 +1151,7 @@ class TestFileSet(object):
 
 class TestMiscellaneous(object):
     def test_version(self):
-        assert "1.0.2" == get_version()
+        assert "1.0.3" == get_version()
 
     def test_rooted(self):
         curdir = os.getcwd()
@@ -1287,16 +1287,17 @@ class TestMiscellaneous(object):
                 assert len(found) == 2
 
     def test_symlinks(self):
-        root = os.path.join(os.path.dirname(os.path.dirname(__file__)), "test/symlinks")
-        pattern = "*.txt"
-        found = [f for f in FileSet(include=pattern, directory=root)]  # symlinks defaults to True
-        assert len(found) == 3
+        if os.name == 'posix':
+            root = os.path.join(os.path.dirname(os.path.dirname(__file__)), "test/symlinks")
+            pattern = "*.txt"
+            found = [f for f in FileSet(include=pattern, directory=root)]  # symlinks defaults to True
+            assert len(found) == 3
 
-        found = [f for f in FileSet(include=pattern, directory=root, symlinks=True)]
-        assert len(found) == 3
+            found = [f for f in FileSet(include=pattern, directory=root, symlinks=True)]
+            assert len(found) == 3
 
-        found = [f for f in FileSet(include=pattern, directory=root, symlinks=False)]
-        assert len(found) == 1
+            found = [f for f in FileSet(include=pattern, directory=root, symlinks=False)]
+            assert len(found) == 1
 
     def test_get_path_components(self):
         drive, components = get_path_components(os.path.join("a", "b", "c"))
