@@ -53,7 +53,9 @@ Output from Formic is formatted like the Unix find command, and so can easily be
 
 will delete all `.bak` files in or under the current directory (but excluding VCS directories such as `.svn` and `.hg`).
 
-Formic can also be integrated right into your Python project::
+Formic can also be integrated right into your Python project:
+
+.. code-block:: python
 
     import formic
     fileset = formic.FileSet(include="**.py",
@@ -67,14 +69,18 @@ Formic can also be integrated right into your Python project::
 
 Formic is always case-insensitive on NT, but can be either case-sensitive or case-insensitive on POSIX.
 
-On NT::
+On NT:
+
+.. code-block:: console
 
     $ formic ./test/ -i "upp*" "upp*/"
     /some/where/formic/test/lower/UPPER.txt
     /some/where/formic/test/UPPER/lower.txt
     /some/where/formic/test/UPPER/UPPER.txt
 
-On POSIX with case-insensitive::
+On POSIX with case-insensitive:
+
+.. code-block:: console
 
     $ formic ./test/ --insensitive -i "upp*" "upp*/"
     /some/where/formic/test/lower/UPPER.txt
