@@ -1,5 +1,5 @@
-Formic: Apache Ant FileSet and Globs in Python
-==============================================
+Formic: Better File Fuzzy Searching Tools
+=========================================
 
 .. image::
   https://img.shields.io/pypi/v/formic2.svg
@@ -11,8 +11,11 @@ Formic: Apache Ant FileSet and Globs in Python
   :target: https://formic.readthedocs.io/
   :alt: ReadTheDocs
 
-History
--------
+Overview
+--------
+
+Formic provides better "file fuzzy searching function" than "find command" on Unix, in my opinion,
+and it can also work well on Windows.
 
 Formic is forked from https://bitbucket.org/aviser/formic. The original project only supports python2.7 and has not been maintained for a long time.
 
