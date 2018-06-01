@@ -1,11 +1,20 @@
 Formic: Better File Fuzzy Searching Tools
 =========================================
 
-[![PyPI](https://img.shields.io/pypi/v/formic2.svg)](https://pypi.python.org/pypi/formic2)
+.. image::
+  https://img.shields.io/pypi/v/formic2.svg
+  :target: https://pypi.python.org/pypi/formic2
+  :alt: Last stable version (PyPI)
 
-[![Docs](https://readthedocs.org/projects/formic/badge/?version=latest)](https://formic.readthedocs.io/)
+.. image::
+  https://readthedocs.org/projects/formic/badge/?version=latest
+  :target: https://formic.readthedocs.io
+  :alt: ReadTheDocs
 
-[![Build Status](https://travis-ci.org/wolfhong/formic.svg?branch=master)](https://travis-ci.org/wolfhong/formic)
+.. image::
+  https://travis-ci.org/wolfhong/formic.svg?branch=master
+  :target: https://travis-ci.org/wolfhong/formic
+  :alt: Build Status
 
 
 Overview
